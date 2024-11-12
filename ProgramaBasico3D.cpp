@@ -63,7 +63,7 @@ Ponto ALVO;
 Ponto VetorAlvo;
 GLfloat CameraMatrix[4][4];
 GLfloat InvCameraMatrix[4][4];
-Ponto PosicaoJogador(0,0,4);
+Ponto PosicaoJogador(0,-0.5,4);
 float RotacaoJogador = 0.0f;
 
 // **********************************************************************
@@ -373,6 +373,7 @@ void reshape( int w, int h )
 float PosicaoZ = -30;
 void display( void )
 {
+    float CorJogador[3] = {0.0f, 1.0f, 1.0f};
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -387,24 +388,11 @@ void display( void )
     DesenhaChao();
     glPopMatrix();
     
-	glPushMatrix();
-		glTranslatef ( 5.0f, 0.0f, 3.0f );
-        glRotatef(angulo,0,1,0);
-		glColor3f(0.5f,0.0f, 0.0f); // Vermelho
-        glutSolidCube(2);
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef ( -4.0f, 0.0f, 2.0f );
-		glRotatef(angulo,0,1,0);
-		glColor3f(0.6156862745, 0.8980392157, 0.9803921569); // Azul claro
-        glutSolidCube(2);
-	glPopMatrix();
-    
-    glPushMatrix();
+    glPushMatrix();// Base do Jogador
         glTranslatef ( PosicaoJogador.x, PosicaoJogador.y, PosicaoJogador.z );
         glRotatef(RotacaoJogador, 0.0f, 1.0f, 0.0f);
-        glColor3f(0.0f,1.0f, 1.0f); // AMARELO
+        glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
+        glScalef(1.0f, 0.5f, 1.0f);
         glutSolidCube(2);
         Ponto P;
         P = InstanciaPonto(Ponto(0,0,0), InvCameraMatrix);
@@ -414,10 +402,23 @@ void display( void )
         P.imprime("Ponto Instanciado: ", "\n");
     glPopMatrix();
 
+	glPushMatrix(); // Cubo vermelho / Cabine
+		glTranslatef(PosicaoJogador.x, PosicaoJogador.y + 0.5f, PosicaoJogador.z );
+        glRotatef(angulo,0,1,0);
+		glColor3f(1.0f,0.0f, 0.0f); // Vermelho
+        glutSolidSphere(0.6f, 20, 20);
+	glPopMatrix();
+
+	glPushMatrix(); 
+		glTranslatef ( -4.0f, 0.0f, 2.0f );
+		glRotatef(angulo,0,1,0);
+		glColor3f(0.6156862745, 0.8980392157, 0.9803921569); // Azul claro
+        glutSolidCube(2);
+	glPopMatrix();
+
     //glColor3f(0.8,0.8,0);
     //glutSolidTeapot(2);
     //DesenhaParedao();
-    
 
 	glutSwapBuffers();
 }
@@ -452,11 +453,11 @@ void keyboard ( unsigned char key, int x, int y )
         glutPostRedisplay();
         break;
     case 'e':
-        RotacaoJogador += 5.0f;
+        RotacaoJogador += 2.5f;
         glutPostRedisplay();
         break;
     case 'q':
-        RotacaoJogador -= 5.0f;
+        RotacaoJogador -= 2.5f;
         glutPostRedisplay();
         break;
     case 'p':
