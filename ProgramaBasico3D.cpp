@@ -373,7 +373,7 @@ void reshape( int w, int h )
 float PosicaoZ = -30;
 void display( void )
 {
-    float CorJogador[3] = {0.0f, 1.0f, 1.0f};
+    float CorJogador[3] = {0.75f, 0.75f, 0.0f};
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -388,26 +388,55 @@ void display( void )
     DesenhaChao();
     glPopMatrix();
     
-    glPushMatrix();// Base do Jogador
+    glPushMatrix(); // Jogador
         glTranslatef ( PosicaoJogador.x, PosicaoJogador.y, PosicaoJogador.z );
         glRotatef(RotacaoJogador, 0.0f, 1.0f, 0.0f);
         glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
-        glScalef(1.0f, 0.5f, 1.0f);
+        glScalef(0.75f, 0.5f, 1.0f);
         glutSolidCube(2);
+
+        glPushMatrix(); // Cabine
+            glTranslatef(0.0f, 1.5f, 0.0f);
+            glScalef(1.0f, 1.0f, 0.75f);
+            glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
+            // glutSolidSphere(0.75f, 20, 20);
+            glutSolidCube(1.5);
+
+            glPushMatrix(); // Canhao
+                glTranslatef(0.0f, 0.0f, -1.0f);
+                glScalef(1.0f, 1.0f, 6.0f);
+                glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
+                glutSolidCube(0.5);
+            glPopMatrix();
+        glPopMatrix();
+
+        glPushMatrix(); // Roda dir
+            glTranslatef(1.25f, -0.5f, 0.0f);
+            glScalef(0.5f, 1.0f, 1.5f);
+            glColor3f(0.25f, 0.25f, 0.25f);
+            glutSolidCube(1);
+        glPopMatrix();
+
+        glPushMatrix(); // Roda esq
+            glTranslatef(-1.25f, -0.5f, 0.0f);
+            glScalef(0.5f, 1.0f, 1.5f);
+            glColor3f(0.25f, 0.25f, 0.25f);
+            glutSolidCube(1);
+        glPopMatrix();
+
         Ponto P;
         P = InstanciaPonto(Ponto(0,0,0), InvCameraMatrix);
         //P = InstanciaPonto(Ponto(0,0,0), OBS, ALVO);
-
         PosicaoJogador.imprime("Posicao do Objeto:", "\n");
         P.imprime("Ponto Instanciado: ", "\n");
     glPopMatrix();
 
-	glPushMatrix(); // Cubo vermelho / Cabine
-		glTranslatef(PosicaoJogador.x, PosicaoJogador.y + 0.5f, PosicaoJogador.z );
-        glRotatef(angulo,0,1,0);
-		glColor3f(1.0f,0.0f, 0.0f); // Vermelho
-        glutSolidSphere(0.6f, 20, 20);
-	glPopMatrix();
+	// glPushMatrix(); // Cabine
+	// 	glTranslatef(PosicaoJogador.x, PosicaoJogador.y + 0.5f, PosicaoJogador.z );
+    //     glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
+    //     // glutSolidSphere(0.75f, 20, 20);
+    //     glutSolidCube(1);
+	// glPopMatrix();
 
 	glPushMatrix(); 
 		glTranslatef ( -4.0f, 0.0f, 2.0f );
