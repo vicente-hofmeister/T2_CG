@@ -63,8 +63,8 @@ Ponto ALVO;
 Ponto VetorAlvo;
 GLfloat CameraMatrix[4][4];
 GLfloat InvCameraMatrix[4][4];
-Ponto PosicaoDoObjeto(0,0,4);
-
+Ponto PosicaoJogador(0,0,4);
+float RotacaoJogador = 0.0f;
 
 // **********************************************************************
 //  void init(void)
@@ -94,7 +94,6 @@ void init(void)
     
 
 }
-
 // **********************************************************************
 //
 // **********************************************************************
@@ -121,8 +120,6 @@ void animate()
         nFrames = 0;
     }
 }
-
-
 // **********************************************************************
 //  void DesenhaCubo()
 // **********************************************************************
@@ -181,7 +178,6 @@ void DesenhaParalelepipedo()
         //DesenhaCubo(1);
     glPopMatrix();
 }
-
 // **********************************************************************
 // void DesenhaLadrilho(int corBorda, int corDentro)
 // Desenha uma c�lula do piso.
@@ -213,7 +209,6 @@ void DesenhaLadrilho(int corBorda, int corDentro)
 
 
 }
-
 // **********************************************************************
 //
 //
@@ -236,7 +231,6 @@ void DesenhaPiso()
     }
     glPopMatrix();
 }
-
 void DesenhaParedao()
 {
     glPushMatrix();
@@ -300,7 +294,6 @@ void DefineLuz(void)
 
 }
 // **********************************************************************
-
 void MygluPerspective(float fieldOfView, float aspect, float zNear, float zFar )
 {
     //https://stackoverflow.com/questions/2417697/gluperspective-was-removed-in-opengl-3-1-any-replacements/2417756#2417756
@@ -374,7 +367,6 @@ void reshape( int w, int h )
 	PosicUser();
 
 }
-
 // **********************************************************************
 //  void display( void )
 // **********************************************************************
@@ -410,14 +402,15 @@ void display( void )
 	glPopMatrix();
     
     glPushMatrix();
-        glTranslatef ( PosicaoDoObjeto.x, PosicaoDoObjeto.y, PosicaoDoObjeto.z );
-        glColor3f(0.8f,0.8f, 0.0f); // AMARELO
+        glTranslatef ( PosicaoJogador.x, PosicaoJogador.y, PosicaoJogador.z );
+        glRotatef(RotacaoJogador, 0.0f, 1.0f, 0.0f);
+        glColor3f(0.0f,1.0f, 1.0f); // AMARELO
         glutSolidCube(2);
         Ponto P;
         P = InstanciaPonto(Ponto(0,0,0), InvCameraMatrix);
         //P = InstanciaPonto(Ponto(0,0,0), OBS, ALVO);
 
-        PosicaoDoObjeto.imprime("Posicao do Objeto:", "\n");
+        PosicaoJogador.imprime("Posicao do Objeto:", "\n");
         P.imprime("Ponto Instanciado: ", "\n");
     glPopMatrix();
 
@@ -428,8 +421,6 @@ void display( void )
 
 	glutSwapBuffers();
 }
-
-
 // **********************************************************************
 //  void keyboard ( unsigned char key, int x, int y )
 //
@@ -437,26 +428,51 @@ void display( void )
 // **********************************************************************
 void keyboard ( unsigned char key, int x, int y )
 {
+    float movimento = 0.1;
+    
 	switch ( key )
 	{
     case 27:        // Termina o programa qdo
-      exit ( 0 );   // a tecla ESC for pressionada
-      break;
-    case 'p':
-            ModoDeProjecao = !ModoDeProjecao;
-            glutPostRedisplay();
-            break;
+        exit ( 0 );   // a tecla ESC for pressionada
+        break;
+    case 'w':
+        PosicaoJogador.z -= movimento;
+        glutPostRedisplay();
+        break;
+    case 's':
+        PosicaoJogador.z += movimento;
+        glutPostRedisplay();
+        break;
+    case 'a':
+        PosicaoJogador.x -= movimento;
+        glutPostRedisplay();
+        break;
+    case 'd':
+        PosicaoJogador.x += movimento;
+        glutPostRedisplay();
+        break;
     case 'e':
-            ModoDeExibicao = !ModoDeExibicao;
-            init();
-            glutPostRedisplay();
-            break;
+        RotacaoJogador += 5.0f;
+        glutPostRedisplay();
+        break;
+    case 'q':
+        RotacaoJogador -= 5.0f;
+        glutPostRedisplay();
+        break;
+    case 'p':
+        ModoDeProjecao = !ModoDeProjecao;
+        glutPostRedisplay();
+        break;
+    case 'o':
+        ModoDeExibicao = !ModoDeExibicao;
+        init();
+        glutPostRedisplay();
+        break;
     default:
             cout << key;
     break;
   }
 }
-
 // **********************************************************************
 //  void arrow_keys ( int a_keys, int x, int y )
 // **********************************************************************
@@ -465,23 +481,22 @@ void arrow_keys ( int a_keys, int x, int y )
 	switch ( a_keys )
 	{
 		case GLUT_KEY_UP:       // When Up Arrow Is Pressed...
-            PosicaoDoObjeto.z--;
+            PosicaoJogador.z--;
 			break;
 	    case GLUT_KEY_DOWN:     // When Down Arrow Is Pressed...
-            PosicaoDoObjeto.z++; 
+            PosicaoJogador.z++; 
 			break;
         case GLUT_KEY_RIGHT:
-            PosicaoDoObjeto.x++;
+            PosicaoJogador.x++;
             break;
         case GLUT_KEY_LEFT:
-            PosicaoDoObjeto.x--;
+            PosicaoJogador.x--;
             break;
 
 		default:
 			break;
 	}
 }
-
 // **********************************************************************
 //  void main ( int argc, char** argv )
 // **********************************************************************
