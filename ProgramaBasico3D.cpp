@@ -1,8 +1,8 @@
 // **********************************************************************
-// PUCRS/Escola Politécnica
-// COMPUTAÇÃO GRÁFICA
+// PUCRS/Escola PolitÔøΩcnica
+// COMPUTAÔøΩÔøΩO GRÔøΩFICA
 //
-// Programa básico para criar aplicacoes 3D em OpenGL
+// Programa bÔøΩsico para criar aplicacoes 3D em OpenGL
 //
 // Marcio Sarroglia Pinho
 // pinho@pucrs.br
@@ -106,7 +106,7 @@ void animate()
     TempoTotal += dt;
     nFrames++;
 
-    if (AccumDeltaT > 1.0/30) // fixa a atualização da tela em 30
+    if (AccumDeltaT > 1.0/30) // fixa a atualizaÔøΩÔøΩo da tela em 30
     {
         AccumDeltaT = 0;
         angulo+= 1;
@@ -184,9 +184,9 @@ void DesenhaParalelepipedo()
 
 // **********************************************************************
 // void DesenhaLadrilho(int corBorda, int corDentro)
-// Desenha uma célula do piso.
+// Desenha uma cÔøΩlula do piso.
 // Eh possivel definir a cor da borda e do interior do piso
-// O ladrilho tem largula 1, centro no (0,0,0) e está sobre o plano XZ
+// O ladrilho tem largula 1, centro no (0,0,0) e estÔøΩ sobre o plano XZ
 // **********************************************************************
 void DesenhaLadrilho(int corBorda, int corDentro)
 {
@@ -265,7 +265,7 @@ void DefineLuz(void)
   GLfloat LuzAmbiente[]   = {0.4, 0.4, 0.4} ;
   GLfloat LuzDifusa[]   = {0.7, 0.7, 0.7};
   //GLfloat LuzDifusa[]   = {0, 0, 0};
-  GLfloat PosicaoLuz0[]  = {0.0f, 3.0f, 5.0f };  // Posição da Luz
+  GLfloat PosicaoLuz0[]  = {0.0f, 3.0f, 5.0f };  // PosiÔøΩÔøΩo da Luz
   GLfloat LuzEspecular[] = {0.9f, 0.9f, 0.9 };
   //GLfloat LuzEspecular[] = {0.0f, 0.0f, 0.0 };
  
@@ -275,12 +275,12 @@ void DefineLuz(void)
 
  glEnable ( GL_COLOR_MATERIAL );
 
-   // Habilita o uso de iluminação
+   // Habilita o uso de iluminaÔøΩÔøΩo
   glEnable(GL_LIGHTING);
 
   // Ativa o uso da luz ambiente
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, LuzAmbiente);
-  // Define os parametros da luz número Zero
+  // Define os parametros da luz nÔøΩmero Zero
   glLightfv(GL_LIGHT0, GL_AMBIENT, LuzAmbiente);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, LuzDifusa  );
   glLightfv(GL_LIGHT0, GL_SPECULAR, LuzEspecular  );
@@ -293,9 +293,9 @@ void DefineLuz(void)
   // Define a reflectancia do material
   glMaterialfv(GL_FRONT,GL_SPECULAR, Especularidade);
 
-  // Define a concentraçãoo do brilho.
+  // Define a concentraÔøΩÔøΩoo do brilho.
   // Quanto maior o valor do Segundo parametro, mais
-  // concentrado será o brilho. (Valores válidos: de 0 a 128)
+  // concentrado serÔøΩ o brilho. (Valores vÔøΩlidos: de 0 a 128)
   glMateriali(GL_FRONT,GL_SHININESS,128);
 
 }
@@ -320,10 +320,10 @@ void MygluPerspective(float fieldOfView, float aspect, float zNear, float zFar )
 void PosicUser()
 {
 
-    // Define os parâmetros da projeção Perspectiva
+    // Define os parÔøΩmetros da projeÔøΩÔøΩo Perspectiva
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    // Define o volume de visualização sempre a partir da posicao do
+    // Define o volume de visualizaÔøΩÔøΩo sempre a partir da posicao do
     // observador
     if (ModoDeProjecao == 0)
         glOrtho(-12, 12, -12, 12, 1, 18); // Projecao paralela Orthografica
@@ -338,8 +338,8 @@ void PosicUser()
     OBS = Ponto(0,0,10);
     ALVO = Ponto(0, 0, 0);
 
-    gluLookAt(OBS.x, OBS.y, OBS.z,   // Posição do Observador
-              ALVO.x, ALVO.y, ALVO.z,     // Posição do Alvo
+    gluLookAt(OBS.x, OBS.y, OBS.z,   // PosiÔøΩÔøΩo do Observador
+              ALVO.x, ALVO.y, ALVO.z,     // PosiÔøΩÔøΩo do Alvo
               0.0,1.0,0.0);
     
     glGetFloatv(GL_MODELVIEW_MATRIX,&CameraMatrix[0][0]);
@@ -359,10 +359,10 @@ void PosicUser()
 void reshape( int w, int h )
 {
 
-	// Evita divisão por zero, no caso de uam janela com largura 0.
+	// Evita divisÔøΩo por zero, no caso de uam janela com largura 0.
 	if(h == 0) h = 1;
-    // Ajusta a relação entre largura e altura para evitar distorção na imagem.
-    // Veja função "PosicUser".
+    // Ajusta a relaÔøΩÔøΩo entre largura e altura para evitar distorÔøΩÔøΩo na imagem.
+    // Veja funÔøΩÔøΩo "PosicUser".
 	AspectRatio = 1.0f * w / h;
 	// Reset the coordinate system before modifying
 	glMatrixMode(GL_PROJECTION);
@@ -490,7 +490,7 @@ int main ( int argc, char** argv )
 	glutInit            ( &argc, argv );
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB );
 	glutInitWindowPosition (0,0);
-	glutInitWindowSize  ( 700, 700 );
+	glutInitWindowSize  ( 1000, 700 );
 	glutCreateWindow    ( "Computacao Grafica - Exemplo Basico 3D" );
 
 	init ();
