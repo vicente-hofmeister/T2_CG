@@ -65,6 +65,8 @@ GLfloat CameraMatrix[4][4];
 GLfloat InvCameraMatrix[4][4];
 Ponto PosicaoJogador(0,-0.5,4);
 float RotacaoJogador = 0.0f;
+float movimento = 0.1;
+float rotacao = 2.5;
 
 // **********************************************************************
 //  void init(void)
@@ -458,7 +460,6 @@ void display( void )
 // **********************************************************************
 void keyboard ( unsigned char key, int x, int y )
 {
-    float movimento = 0.1;
     
 	switch ( key )
 	{
@@ -466,27 +467,21 @@ void keyboard ( unsigned char key, int x, int y )
         exit ( 0 );   // a tecla ESC for pressionada
         break;
     case 'w':
-        PosicaoJogador.z -= movimento;
+        PosicaoJogador.x -= movimento * sin(RotacaoJogador * M_PI / 180.0f);
+        PosicaoJogador.z -= movimento * cos(RotacaoJogador * M_PI / 180.0f);
         glutPostRedisplay();
         break;
     case 's':
-        PosicaoJogador.z += movimento;
+        PosicaoJogador.x += movimento * sin(RotacaoJogador * M_PI / 180.0f);
+        PosicaoJogador.z += movimento * cos(RotacaoJogador * M_PI / 180.0f);
         glutPostRedisplay();
         break;
     case 'a':
-        PosicaoJogador.x -= movimento;
+        RotacaoJogador += rotacao;
         glutPostRedisplay();
         break;
     case 'd':
-        PosicaoJogador.x += movimento;
-        glutPostRedisplay();
-        break;
-    case 'e':
-        RotacaoJogador += 2.5f;
-        glutPostRedisplay();
-        break;
-    case 'q':
-        RotacaoJogador -= 2.5f;
+        RotacaoJogador -= rotacao;
         glutPostRedisplay();
         break;
     case 'p':
@@ -511,16 +506,18 @@ void arrow_keys ( int a_keys, int x, int y )
 	switch ( a_keys )
 	{
 		case GLUT_KEY_UP:       // When Up Arrow Is Pressed...
-            PosicaoJogador.z--;
+            PosicaoJogador.x -= movimento * sin(RotacaoJogador * M_PI / 180.0f);
+            PosicaoJogador.z -= movimento * cos(RotacaoJogador * M_PI / 180.0f);
 			break;
 	    case GLUT_KEY_DOWN:     // When Down Arrow Is Pressed...
-            PosicaoJogador.z++; 
+            PosicaoJogador.x += movimento * sin(RotacaoJogador * M_PI / 180.0f);
+            PosicaoJogador.z += movimento * cos(RotacaoJogador * M_PI / 180.0f);
 			break;
         case GLUT_KEY_RIGHT:
-            PosicaoJogador.x++;
+            RotacaoJogador -= rotacao;
             break;
         case GLUT_KEY_LEFT:
-            PosicaoJogador.x--;
+            RotacaoJogador += rotacao;
             break;
 
 		default:
