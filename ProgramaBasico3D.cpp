@@ -14,7 +14,6 @@
 
 using namespace std;
 
-
 #ifdef WIN32
 #include <windows.h>
 #include <glut.h>
@@ -39,7 +38,6 @@ using namespace std;
 Temporizador T;
 double AccumDeltaT=0;
 
-
 GLfloat AspectRatio, angulo=0;
 
 // Controle do modo de projecao
@@ -48,13 +46,11 @@ GLfloat AspectRatio, angulo=0;
 // pela tecla 'p'
 int ModoDeProjecao = 1;
 
-
 // Controle do modo de projecao
 // 0: Wireframe; 1: Faces preenchidas
 // A funcao "Init" utiliza esta variavel. O valor dela eh alterado
 // pela tecla 'e'
 int ModoDeExibicao = 1;
-
 double nFrames=0;
 double TempoTotal=0;
 Ponto CantoEsquerdo = Ponto(-20,0,-10);
@@ -65,8 +61,9 @@ GLfloat CameraMatrix[4][4];
 GLfloat InvCameraMatrix[4][4];
 Ponto PosicaoJogador(0,-0.5,4);
 float RotacaoJogador = 0.0f;
-float movimento = 0.1;
-float rotacao = 2.5;
+float movimento = 0.01;
+float rotacao = 0.25;
+bool teclaW = false, teclaA = false, teclaS = false, teclaD = false;
 
 // **********************************************************************
 //  void init(void)
@@ -95,32 +92,6 @@ void init(void)
     
     
 
-}
-// **********************************************************************
-//
-// **********************************************************************
-void animate()
-{
-    double dt;
-    dt = T.getDeltaT();
-    AccumDeltaT += dt;
-    TempoTotal += dt;
-    nFrames++;
-
-    if (AccumDeltaT > 1.0/30) // fixa a atualiza��o da tela em 30
-    {
-        AccumDeltaT = 0;
-        angulo+= 1;
-        glutPostRedisplay();
-    }
-    if (TempoTotal > 5.0)
-    {
-        cout << "Tempo Acumulado: "  << TempoTotal << " segundos. " ;
-        cout << "Nros de Frames sem desenho: " << nFrames << endl;
-        cout << "FPS(sem desenho): " << nFrames/TempoTotal << endl;
-        TempoTotal = 0;
-        nFrames = 0;
-    }
 }
 // **********************************************************************
 //  void DesenhaCubo()
@@ -372,7 +343,6 @@ void reshape( int w, int h )
 // **********************************************************************
 //  void display( void )
 // **********************************************************************
-float PosicaoZ = -30;
 void display( void )
 {
     float CorJogador[3] = {0.75f, 0.75f, 0.0f};
@@ -399,17 +369,25 @@ void display( void )
 
         glPushMatrix(); // Cabine
             glTranslatef(0.0f, 1.5f, 0.0f);
-            glScalef(1.0f, 1.0f, 0.75f);
+            glScalef(1.0f, 1.5f, 0.75f);
             glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
-            // glutSolidSphere(0.75f, 20, 20);
-            glutSolidCube(1.5);
+            glutSolidSphere(0.9f, 20, 20);
 
+            GLUquadric *quad = gluNewQuadric();
             glPushMatrix(); // Canhao
-                glTranslatef(0.0f, 0.0f, -1.0f);
-                glScalef(1.0f, 1.0f, 6.0f);
+                glTranslatef(0.0f, 0.25f, -2.0f);
                 glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
-                glutSolidCube(0.5);
+                gluCylinder(quad, 0.3f, 0.15f, 1.5f, 10, 10);
+
+                glPushMatrix();
+                    glColor3b(0.0f, 0.0f, 0.0f);
+                    glRotatef(180, 1.0f, 0.0f, 0.0f); // Inverte para alinhar com a base
+                    gluDisk(quad, 0.0, 0.3, 10, 1); // Desenha o disco da base
+                glPopMatrix();
             glPopMatrix();
+            gluDeleteQuadric(quad);
+
+
         glPopMatrix();
 
         glPushMatrix(); // Roda dir
@@ -433,13 +411,6 @@ void display( void )
         P.imprime("Ponto Instanciado: ", "\n");
     glPopMatrix();
 
-	// glPushMatrix(); // Cabine
-	// 	glTranslatef(PosicaoJogador.x, PosicaoJogador.y + 0.5f, PosicaoJogador.z );
-    //     glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
-    //     // glutSolidSphere(0.75f, 20, 20);
-    //     glutSolidCube(1);
-	// glPopMatrix();
-
 	glPushMatrix(); 
 		glTranslatef ( -4.0f, 0.0f, 2.0f );
 		glRotatef(angulo,0,1,0);
@@ -452,51 +423,6 @@ void display( void )
     //DesenhaParedao();
 
 	glutSwapBuffers();
-}
-// **********************************************************************
-//  void keyboard ( unsigned char key, int x, int y )
-//
-//
-// **********************************************************************
-void keyboard ( unsigned char key, int x, int y )
-{
-    
-	switch ( key )
-	{
-    case 27:        // Termina o programa qdo
-        exit ( 0 );   // a tecla ESC for pressionada
-        break;
-    case 'w':
-        PosicaoJogador.x -= movimento * sin(RotacaoJogador * M_PI / 180.0f);
-        PosicaoJogador.z -= movimento * cos(RotacaoJogador * M_PI / 180.0f);
-        glutPostRedisplay();
-        break;
-    case 's':
-        PosicaoJogador.x += movimento * sin(RotacaoJogador * M_PI / 180.0f);
-        PosicaoJogador.z += movimento * cos(RotacaoJogador * M_PI / 180.0f);
-        glutPostRedisplay();
-        break;
-    case 'a':
-        RotacaoJogador += rotacao;
-        glutPostRedisplay();
-        break;
-    case 'd':
-        RotacaoJogador -= rotacao;
-        glutPostRedisplay();
-        break;
-    case 'p':
-        ModoDeProjecao = !ModoDeProjecao;
-        glutPostRedisplay();
-        break;
-    case 'o':
-        ModoDeExibicao = !ModoDeExibicao;
-        init();
-        glutPostRedisplay();
-        break;
-    default:
-            cout << key;
-    break;
-  }
 }
 // **********************************************************************
 //  void arrow_keys ( int a_keys, int x, int y )
@@ -525,28 +451,132 @@ void arrow_keys ( int a_keys, int x, int y )
 	}
 }
 // **********************************************************************
+//  void keyboard ( unsigned char key, int x, int y )
+// **********************************************************************
+void keyboard ( unsigned char key, int x, int y )
+{
+    
+	switch ( key )
+	{
+    case 27:        // Termina o programa qdo
+        exit ( 0 );   // a tecla ESC for pressionada
+        break;
+    case 'w':
+        teclaW = true;
+        break;
+    case 's':
+        teclaS = true;
+        break;
+    case 'a':
+        teclaA = true;
+        break;
+    case 'd':
+        teclaD = true;
+        break;
+    case 'p':
+        ModoDeProjecao = !ModoDeProjecao;
+        glutPostRedisplay();
+        break;
+    case 'o':
+        ModoDeExibicao = !ModoDeExibicao;
+        init();
+        glutPostRedisplay();
+        break;
+    default:
+            cout << key;
+    break;
+  }
+}
+// **********************************************************************
+//  void keyboardUp ( unsigned char key, int x, int y )
+// **********************************************************************
+void keyboardUp(unsigned char key, int x, int y)
+{
+    switch (key)
+    {
+        case 'w':
+            teclaW = false;
+            break;
+        case 's':
+            teclaS = false;
+            break;
+        case 'a':
+            teclaA = false;
+            break;
+        case 'd':
+            teclaD = false;
+            break;
+    }
+}
+// **********************************************************************
+//  void atualizaMovimento ( )
+// **********************************************************************
+void atualizaMovimento()
+{
+    if (teclaW) {
+        PosicaoJogador.x -= movimento * sin(RotacaoJogador * M_PI / 180.0f);
+        PosicaoJogador.z -= movimento * cos(RotacaoJogador * M_PI / 180.0f);
+    }
+    if (teclaS) {
+        PosicaoJogador.x += movimento * sin(RotacaoJogador * M_PI / 180.0f);
+        PosicaoJogador.z += movimento * cos(RotacaoJogador * M_PI / 180.0f);
+    }
+    if (teclaA) {
+        RotacaoJogador += rotacao;
+    }
+    if (teclaD) {
+        RotacaoJogador -= rotacao;
+    }
+    glutPostRedisplay();
+}
+// **********************************************************************
+//
+// **********************************************************************
+void animate()
+{
+    atualizaMovimento();
+
+    double dt;
+    dt = T.getDeltaT();
+    AccumDeltaT += dt;
+    TempoTotal += dt;
+    nFrames++;
+
+    if (AccumDeltaT > 1.0/30) // fixa a atualiza��o da tela em 30
+    {
+        AccumDeltaT = 0;
+        angulo+= 1;
+        glutPostRedisplay();
+    }
+    if (TempoTotal > 5.0)
+    {
+        cout << "Tempo Acumulado: "  << TempoTotal << " segundos. " ;
+        cout << "Nros de Frames sem desenho: " << nFrames << endl;
+        cout << "FPS(sem desenho): " << nFrames/TempoTotal << endl;
+        TempoTotal = 0;
+        nFrames = 0;
+    }
+}
+// **********************************************************************
 //  void main ( int argc, char** argv )
 // **********************************************************************
 int main ( int argc, char** argv )
 {
-	glutInit            ( &argc, argv );
-	glutInitDisplayMode (GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB );
-	glutInitWindowPosition (0,0);
-	glutInitWindowSize  ( 1000, 700 );
-	glutCreateWindow    ( "Computacao Grafica - Exemplo Basico 3D" );
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGB);
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(1000, 700);
+	glutCreateWindow( "Computacao Grafica - Exemplo Basico 3D" );
 
 	init ();
-    //system("pwd");
 
-	glutDisplayFunc ( display );
-	glutReshapeFunc ( reshape );
-	glutKeyboardFunc ( keyboard );
-	glutSpecialFunc ( arrow_keys );
-	glutIdleFunc ( animate );
+	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
+	glutKeyboardFunc(keyboard);
+	glutKeyboardUpFunc(keyboardUp);
+	glutSpecialFunc(arrow_keys);
+	glutIdleFunc(animate);
 
 	glutMainLoop ( );
 	return 0;
 }
-
-
-
