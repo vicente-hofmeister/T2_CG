@@ -61,8 +61,9 @@ GLfloat CameraMatrix[4][4];
 GLfloat InvCameraMatrix[4][4];
 Ponto PosicaoJogador(0,-0.5,4);
 float RotacaoJogador = 0.0f;
-float movimento = 0.01;
-float rotacao = 0.25;
+float movimento = 0.02f;
+float rotacao = 0.5f;
+float anguloCanhao = 0.0f;
 bool teclaW = false, teclaA = false, teclaS = false, teclaD = false;
 
 // **********************************************************************
@@ -267,6 +268,8 @@ void DefineLuz(void)
 
 }
 // **********************************************************************
+//
+// **********************************************************************
 void MygluPerspective(float fieldOfView, float aspect, float zNear, float zFar )
 {
     //https://stackoverflow.com/questions/2417697/gluperspective-was-removed-in-opengl-3-1-any-replacements/2417756#2417756
@@ -320,7 +323,6 @@ void PosicUser()
 // **********************************************************************
 //  void reshape( int w, int h )
 //		trata o redimensionamento da janela OpenGL
-//
 // **********************************************************************
 void reshape( int w, int h )
 {
@@ -375,7 +377,10 @@ void display( void )
 
             GLUquadric *quad = gluNewQuadric();
             glPushMatrix(); // Canhao
-                glTranslatef(0.0f, 0.25f, -2.0f);
+                glTranslatef(0.0f, 0.25f, -0.25f);
+                glRotatef(anguloCanhao, 1.0f, 0.0f, 0.0f);
+                glTranslatef(0.0f, 0.0f, -1.5f);
+
                 glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
                 gluCylinder(quad, 0.3f, 0.15f, 1.5f, 10, 10);
 
@@ -456,36 +461,43 @@ void arrow_keys ( int a_keys, int x, int y )
 void keyboard ( unsigned char key, int x, int y )
 {
     
-	switch ( key )
-	{
-    case 27:        // Termina o programa qdo
-        exit ( 0 );   // a tecla ESC for pressionada
+    switch ( key )
+    {
+        case 27:        // Termina o programa qdo
+            exit ( 0 );   // a tecla ESC for pressionada
+            break;
+        case 'w':
+            teclaW = true;
+            break;
+        case 's':
+            teclaS = true;
+            break;
+        case 'a':
+            teclaA = true;
+            break;
+        case 'd':
+            teclaD = true;
+            break;
+        case 'r':
+            if (anguloCanhao < 50.0f)
+                anguloCanhao += 2.5f; 
+            break;
+        case 'f':
+            if (anguloCanhao > -10.0f)
+                anguloCanhao -= 2.5f;
+            break;
+        case 'p':
+            ModoDeProjecao = !ModoDeProjecao;
+            break;
+        case 'o':
+            ModoDeExibicao = !ModoDeExibicao;
+            init();
+            break;
+        default:
+                cout << key;
         break;
-    case 'w':
-        teclaW = true;
-        break;
-    case 's':
-        teclaS = true;
-        break;
-    case 'a':
-        teclaA = true;
-        break;
-    case 'd':
-        teclaD = true;
-        break;
-    case 'p':
-        ModoDeProjecao = !ModoDeProjecao;
-        glutPostRedisplay();
-        break;
-    case 'o':
-        ModoDeExibicao = !ModoDeExibicao;
-        init();
-        glutPostRedisplay();
-        break;
-    default:
-            cout << key;
-    break;
-  }
+    }
+    glutPostRedisplay();
 }
 // **********************************************************************
 //  void keyboardUp ( unsigned char key, int x, int y )
