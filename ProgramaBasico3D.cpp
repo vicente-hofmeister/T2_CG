@@ -11,6 +11,7 @@
 #include <iostream>
 #include <cmath>
 #include <ctime>
+#include <vector>
 
 using namespace std;
 
@@ -66,6 +67,7 @@ float rotacao = 1.75f;
 float anguloCanhao = 0.0f;
 float DistanciaCamera = 3.0f;
 float AlturaCamera = 1.5f;
+float CorJogador[3] = {0.75f, 0.75f, 0.0f};
 bool teclaW = false, teclaA = false, teclaS = false, teclaD = false;
 
 // **********************************************************************
@@ -145,6 +147,9 @@ void DesenhaCubo(float tamAresta)
     glEnd();
 
 }
+// **********************************************************************
+//
+// **********************************************************************
 void DesenhaParalelepipedo()
 {
     glPushMatrix();
@@ -235,7 +240,6 @@ void DesenhaChao()
 // **********************************************************************
 void DesenhaJogador()
 {
-    float CorJogador[3] = {0.75f, 0.75f, 0.0f};
 
     glPushMatrix(); // Jogador
         glTranslatef ( PosicaoJogador.x, PosicaoJogador.y, PosicaoJogador.z );
@@ -289,6 +293,47 @@ void DesenhaJogador()
         PosicaoJogador.imprime("Posicao do Objeto:", "\n");
         P.imprime("Ponto Instanciado: ", "\n");
     glPopMatrix();
+}
+// **********************************************************************
+//
+// **********************************************************************
+void DesenhaPoliedro(Ponto p1, Ponto p2)
+{
+    float minX = std::min(p1.x, p2.x);
+    float minY = std::min(p1.y, p2.y);
+    float minZ = std::min(p1.z, p2.z);
+    float maxX = std::max(p1.x, p2.x);
+    float maxY = std::max(p1.y, p2.y);
+    float maxZ = std::max(p1.z, p2.z);
+    float lengthX = maxX - minX;
+    float lengthY = maxY - minY;
+    float lengthZ = maxZ - minZ;
+    float centralX = minX + (lengthX / 2);
+    float centralY = minY + (lengthY / 2);
+    float centralZ = minZ + (lengthZ / 2);
+
+    // Ponto vertices[] = {
+    //     {minX, minY, minZ}, {maxX, minY, minZ}, {maxX, maxY, minZ}, {minX, maxY, minZ},
+    //     {minX, minY, maxZ}, {maxX, minY, maxZ}, {maxX, maxY, maxZ}, {minX, maxY, maxZ}
+    // };
+
+    // int faces[6][4] = {
+    //     {0, 1, 2, 3}, // Base inferior
+    //     {4, 5, 6, 7}, // Base superior
+    //     {0, 1, 5, 4}, // Face frontal
+    //     {1, 2, 6, 5}, // Face direita
+    //     {2, 3, 7, 6}, // Face traseira
+    //     // {6, 7, 3, 2}, // Face traseira
+    //     {3, 0, 4, 7}  // Face esquerda
+    // };
+
+    glPushMatrix();
+        glTranslatef(centralX, centralY, centralZ);
+        glScalef(lengthX, lengthY, lengthZ);
+        glutSolidCube(1);
+        glEnd();
+    glPopMatrix();
+
 }
 // **********************************************************************
 //  void DefineLuz(void)
@@ -441,6 +486,11 @@ void display( void )
     glPopMatrix();
     
     DesenhaJogador();
+    
+    Ponto p1 = Ponto(0.0f,-1.0f,0.0f);
+    Ponto p2 = Ponto(2.0f,0.5f,5.0f);
+
+    DesenhaPoliedro(p1, p2);
 
 	glPushMatrix(); 
 		glTranslatef ( -4.0f, 0.0f, 2.0f );
