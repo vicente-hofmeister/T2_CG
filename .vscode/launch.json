@@ -6,11 +6,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/BasicoOpenGL",
-      "args": [
-        "arg1",
-        "aqrg2",
-        "arg3"
-      ],
+      "args": ["arg1", "aqrg2", "arg3"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],

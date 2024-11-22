@@ -35,6 +35,7 @@ using namespace std;
 #include "Ponto.h"
 #include "Instancia.h"
 #include "Tools.h"
+#include "Poliedro.h"
 
 Temporizador T;
 double AccumDeltaT=0;
@@ -319,17 +320,7 @@ void DesenhaPoliedro(Ponto p1, Ponto p2)
     float centralX = minX + (lengthX / 2);
     float centralY = minY + (lengthY / 2);
     float centralZ = minZ + (lengthZ / 2);
-    float r = 0.0f;
-    float g = 0.5f;
-    float b = 0.5f;
-
-    // if (p1.x < 0.0f && p2.x < 0.0f)
-    //     r = 1.0f;
-    // else if (p1.x < 0.0f && p2.x > 0.0f)
-    //     r = 0.5f;
-
-    glColor3f(r, g, b);
-
+    
     glPushMatrix();
         glTranslatef(centralX, centralY, centralZ);
         glScalef(lengthX, lengthY, lengthZ);
@@ -398,6 +389,24 @@ void DefineLuz(void)
   // concentrado ser� o brilho. (Valores v�lidos: de 0 a 128)
   glMateriali(GL_FRONT,GL_SHININESS,128);
 
+}
+// **********************************************************************
+// 
+// **********************************************************************
+bool checaColisao(const Poliedro& poliedro1, const Poliedro& poliedro2) {
+    Ponto min1 = poliedro1.getMin();
+    Ponto max1 = poliedro1.getMax();
+
+    Ponto min2 = poliedro2.getMin();
+    Ponto max2 = poliedro2.getMax();
+
+    // Verifica sobreposição em cada eixo
+    bool colisaoX = !(max1.x < min2.x || max2.x < min1.x);
+    bool colisaoY = !(max1.y < min2.y || max2.y < min1.y);
+    bool colisaoZ = !(max1.z < min2.z || max2.z < min1.z);
+
+    // Os cubos colidem se houver sobreposição em todos os eixos
+    return colisaoX && colisaoY && colisaoZ;
 }
 // **********************************************************************
 //
