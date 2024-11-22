@@ -61,9 +61,11 @@ GLfloat CameraMatrix[4][4];
 GLfloat InvCameraMatrix[4][4];
 Ponto PosicaoJogador(0,-0.5,4);
 float RotacaoJogador = 0.0f;
-float movimento = 0.02f;
-float rotacao = 0.5f;
+float movimento = 0.1f;
+float rotacao = 1.75f;
 float anguloCanhao = 0.0f;
+float DistanciaCamera = 3.0f;
+float AlturaCamera = 1.5f;
 bool teclaW = false, teclaA = false, teclaS = false, teclaD = false;
 
 // **********************************************************************
@@ -185,7 +187,6 @@ void DesenhaLadrilho(int corBorda, int corDentro)
 }
 // **********************************************************************
 //
-//
 // **********************************************************************
 void DesenhaPiso()
 {
@@ -205,6 +206,9 @@ void DesenhaPiso()
     }
     glPopMatrix();
 }
+// **********************************************************************
+//
+// **********************************************************************
 void DesenhaParedao()
 {
     glPushMatrix();
@@ -212,6 +216,9 @@ void DesenhaParedao()
         DesenhaPiso();
     glPopMatrix();
 }
+// **********************************************************************
+//
+// **********************************************************************
 void DesenhaChao()
 {
     glPushMatrix();
@@ -221,6 +228,66 @@ void DesenhaChao()
     glPushMatrix();
         glTranslated(20, 0, 0);
         DesenhaPiso();
+    glPopMatrix();
+}
+// **********************************************************************
+//
+// **********************************************************************
+void DesenhaJogador()
+{
+    float CorJogador[3] = {0.75f, 0.75f, 0.0f};
+
+    glPushMatrix(); // Jogador
+        glTranslatef ( PosicaoJogador.x, PosicaoJogador.y, PosicaoJogador.z );
+        glRotatef(RotacaoJogador, 0.0f, 1.0f, 0.0f);
+        glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
+        glScalef(0.75f, 0.5f, 1.0f);
+        glutSolidCube(2);
+
+        glPushMatrix(); // Cabine
+            glTranslatef(0.0f, 1.5f, 0.0f);
+            glScalef(1.0f, 1.5f, 0.75f);
+            glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
+            glutSolidSphere(0.9f, 20, 20);
+
+            GLUquadric *quad = gluNewQuadric();
+            glPushMatrix(); // Canhao
+                glTranslatef(0.0f, 0.25f, -0.25f);
+                glRotatef(anguloCanhao, 1.0f, 0.0f, 0.0f);
+                glTranslatef(0.0f, 0.0f, -1.5f);
+
+                glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
+                gluCylinder(quad, 0.3f, 0.15f, 1.5f, 10, 10);
+
+                glPushMatrix();
+                    glColor3b(0.0f, 0.0f, 0.0f);
+                    glRotatef(180, 1.0f, 0.0f, 0.0f); // Inverte para alinhar com a base
+                    gluDisk(quad, 0.0, 0.3, 10, 1); // Desenha o disco da base
+                glPopMatrix();
+            glPopMatrix();
+            gluDeleteQuadric(quad);
+
+        glPopMatrix();
+
+        glPushMatrix(); // Roda dir
+            glTranslatef(1.25f, -0.5f, 0.0f);
+            glScalef(0.5f, 1.0f, 1.5f);
+            glColor3f(0.25f, 0.25f, 0.25f);
+            glutSolidCube(1);
+        glPopMatrix();
+
+        glPushMatrix(); // Roda esq
+            glTranslatef(-1.25f, -0.5f, 0.0f);
+            glScalef(0.5f, 1.0f, 1.5f);
+            glColor3f(0.25f, 0.25f, 0.25f);
+            glutSolidCube(1);
+        glPopMatrix();
+
+        Ponto P;
+        P = InstanciaPonto(Ponto(0,0,0), InvCameraMatrix);
+        //P = InstanciaPonto(Ponto(0,0,0), OBS, ALVO);
+        PosicaoJogador.imprime("Posicao do Objeto:", "\n");
+        P.imprime("Ponto Instanciado: ", "\n");
     glPopMatrix();
 }
 // **********************************************************************
@@ -301,15 +368,27 @@ void PosicUser()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    
-    OBS = Ponto(0,0,10);
-    ALVO = Ponto(0, 0, 0);
+    if (ModoDeProjecao <= 1) {
+        OBS = Ponto(0,0,10);
+        ALVO = Ponto(0, 0, 0);
 
-    gluLookAt(OBS.x, OBS.y, OBS.z,   // Posi��o do Observador
-              ALVO.x, ALVO.y, ALVO.z,     // Posi��o do Alvo
-              0.0,1.0,0.0);
+        gluLookAt(OBS.x, OBS.y, OBS.z,   // Posi��o do Observador
+                  ALVO.x, ALVO.y, ALVO.z,     // Posi��o do Alvo
+                  0.0,1.0,0.0);
+    }
+    else if (ModoDeProjecao == 2) {
+
+
+        OBS.x = PosicaoJogador.x + DistanciaCamera * sin(RotacaoJogador * M_PI / 180.0);
+        OBS.y = PosicaoJogador.y + AlturaCamera;
+        OBS.z = PosicaoJogador.z + DistanciaCamera * cos(RotacaoJogador * M_PI / 180.0);
+        ALVO = PosicaoJogador;
+
+        gluLookAt(OBS.x, OBS.y, OBS.z,   // Posi��o do Observador
+                  ALVO.x, ALVO.y, ALVO.z,     // Posi��o do Alvo
+                  0.0,1.0,0.0);
+    }
+    
     
     glGetFloatv(GL_MODELVIEW_MATRIX,&CameraMatrix[0][0]);
     InverteMatriz(CameraMatrix, InvCameraMatrix);
@@ -347,7 +426,6 @@ void reshape( int w, int h )
 // **********************************************************************
 void display( void )
 {
-    float CorJogador[3] = {0.75f, 0.75f, 0.0f};
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -362,59 +440,7 @@ void display( void )
     DesenhaChao();
     glPopMatrix();
     
-    glPushMatrix(); // Jogador
-        glTranslatef ( PosicaoJogador.x, PosicaoJogador.y, PosicaoJogador.z );
-        glRotatef(RotacaoJogador, 0.0f, 1.0f, 0.0f);
-        glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
-        glScalef(0.75f, 0.5f, 1.0f);
-        glutSolidCube(2);
-
-        glPushMatrix(); // Cabine
-            glTranslatef(0.0f, 1.5f, 0.0f);
-            glScalef(1.0f, 1.5f, 0.75f);
-            glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
-            glutSolidSphere(0.9f, 20, 20);
-
-            GLUquadric *quad = gluNewQuadric();
-            glPushMatrix(); // Canhao
-                glTranslatef(0.0f, 0.25f, -0.25f);
-                glRotatef(anguloCanhao, 1.0f, 0.0f, 0.0f);
-                glTranslatef(0.0f, 0.0f, -1.5f);
-
-                glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
-                gluCylinder(quad, 0.3f, 0.15f, 1.5f, 10, 10);
-
-                glPushMatrix();
-                    glColor3b(0.0f, 0.0f, 0.0f);
-                    glRotatef(180, 1.0f, 0.0f, 0.0f); // Inverte para alinhar com a base
-                    gluDisk(quad, 0.0, 0.3, 10, 1); // Desenha o disco da base
-                glPopMatrix();
-            glPopMatrix();
-            gluDeleteQuadric(quad);
-
-
-        glPopMatrix();
-
-        glPushMatrix(); // Roda dir
-            glTranslatef(1.25f, -0.5f, 0.0f);
-            glScalef(0.5f, 1.0f, 1.5f);
-            glColor3f(0.25f, 0.25f, 0.25f);
-            glutSolidCube(1);
-        glPopMatrix();
-
-        glPushMatrix(); // Roda esq
-            glTranslatef(-1.25f, -0.5f, 0.0f);
-            glScalef(0.5f, 1.0f, 1.5f);
-            glColor3f(0.25f, 0.25f, 0.25f);
-            glutSolidCube(1);
-        glPopMatrix();
-
-        Ponto P;
-        P = InstanciaPonto(Ponto(0,0,0), InvCameraMatrix);
-        //P = InstanciaPonto(Ponto(0,0,0), OBS, ALVO);
-        PosicaoJogador.imprime("Posicao do Objeto:", "\n");
-        P.imprime("Ponto Instanciado: ", "\n");
-    glPopMatrix();
+    DesenhaJogador();
 
 	glPushMatrix(); 
 		glTranslatef ( -4.0f, 0.0f, 2.0f );
@@ -487,7 +513,13 @@ void keyboard ( unsigned char key, int x, int y )
                 anguloCanhao -= 2.5f;
             break;
         case 'p':
-            ModoDeProjecao = !ModoDeProjecao;
+            if (ModoDeProjecao == 0)
+                ModoDeProjecao = 1;
+            else if (ModoDeProjecao == 1)
+                ModoDeProjecao = 2;
+            else 
+                ModoDeProjecao = 0;
+                
             break;
         case 'o':
             ModoDeExibicao = !ModoDeExibicao;
