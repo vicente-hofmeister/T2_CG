@@ -68,6 +68,9 @@ float anguloCanhao = 0.0f;
 float DistanciaCamera = 3.0f;
 float AlturaCamera = 1.5f;
 float CorJogador[3] = {0.75f, 0.75f, 0.0f};
+float blocoTamMin = 0.1f;
+std::pair<Ponto, Ponto> paredeInicial = {Ponto(-12.5f,-1.0f,-4.0f),Ponto(12.5f,5.0f,-8.0f)};
+std::vector<std::pair<Ponto, Ponto>> listaBlocos;
 bool teclaW = false, teclaA = false, teclaS = false, teclaD = false;
 
 // **********************************************************************
@@ -94,9 +97,8 @@ void init(void)
     ALVO = Ponto(0, 0, 0);
     OBS = Ponto(0,3,10);
     VetorAlvo = ALVO - OBS;
-    
-    
 
+    listaBlocos.push_back(paredeInicial);
 }
 // **********************************************************************
 //  void DesenhaCubo()
@@ -336,6 +338,23 @@ void DesenhaPoliedro(Ponto p1, Ponto p2)
 
 }
 // **********************************************************************
+// 
+// **********************************************************************
+void DesenhaParede()
+{
+    // Ponto p1 = Ponto(-4.0f,-0.5f,1.0f);
+    // Ponto p2 = Ponto(4.0f,3.5f,2.0f);
+
+    // DesenhaPoliedro(p1, p2);
+
+    for (int i = 0; i < listaBlocos.size(); i++) {
+        Ponto p1 = listaBlocos[i].first;
+        Ponto p2 = listaBlocos[i].second;
+
+        DesenhaPoliedro(p1, p2);
+    }
+}
+// **********************************************************************
 //  void DefineLuz(void)
 // **********************************************************************
 void DefineLuz(void)
@@ -487,10 +506,7 @@ void display( void )
     
     DesenhaJogador();
     
-    Ponto p1 = Ponto(0.0f,-1.0f,0.0f);
-    Ponto p2 = Ponto(2.0f,0.5f,5.0f);
-
-    DesenhaPoliedro(p1, p2);
+    DesenhaParede();
 
 	glPushMatrix(); 
 		glTranslatef ( -4.0f, 0.0f, 2.0f );
