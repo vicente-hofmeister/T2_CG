@@ -98,7 +98,13 @@ void init(void)
     OBS = Ponto(0,3,10);
     VetorAlvo = ALVO - OBS;
 
+    std::pair<Ponto, Ponto> p1 = {Ponto(13.5f,-1.0f,-4.0f),Ponto(12.5f,5.0f,-8.0f)};
+    std::pair<Ponto, Ponto> p2 = {Ponto(-12.5f,-1.0f,-4.0f),Ponto(-13.5f,5.0f,-8.0f)};
+
     listaBlocos.push_back(paredeInicial);
+    listaBlocos.push_back(p1);
+    listaBlocos.push_back(p2);
+
 }
 // **********************************************************************
 //  void DesenhaCubo()
@@ -313,21 +319,16 @@ void DesenhaPoliedro(Ponto p1, Ponto p2)
     float centralX = minX + (lengthX / 2);
     float centralY = minY + (lengthY / 2);
     float centralZ = minZ + (lengthZ / 2);
+    float r = 0.0f;
+    float g = 0.5f;
+    float b = 0.5f;
 
-    // Ponto vertices[] = {
-    //     {minX, minY, minZ}, {maxX, minY, minZ}, {maxX, maxY, minZ}, {minX, maxY, minZ},
-    //     {minX, minY, maxZ}, {maxX, minY, maxZ}, {maxX, maxY, maxZ}, {minX, maxY, maxZ}
-    // };
+    // if (p1.x < 0.0f && p2.x < 0.0f)
+    //     r = 1.0f;
+    // else if (p1.x < 0.0f && p2.x > 0.0f)
+    //     r = 0.5f;
 
-    // int faces[6][4] = {
-    //     {0, 1, 2, 3}, // Base inferior
-    //     {4, 5, 6, 7}, // Base superior
-    //     {0, 1, 5, 4}, // Face frontal
-    //     {1, 2, 6, 5}, // Face direita
-    //     {2, 3, 7, 6}, // Face traseira
-    //     // {6, 7, 3, 2}, // Face traseira
-    //     {3, 0, 4, 7}  // Face esquerda
-    // };
+    glColor3f(r, g, b);
 
     glPushMatrix();
         glTranslatef(centralX, centralY, centralZ);
