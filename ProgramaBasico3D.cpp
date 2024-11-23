@@ -69,9 +69,10 @@ float anguloCanhao = 0.0f;
 float DistanciaCamera = 3.0f;
 float AlturaCamera = 1.5f;
 float CorJogador[3] = {0.75f, 0.75f, 0.0f};
-float blocoTamMin = 0.1f;
-std::pair<Ponto, Ponto> paredeInicial = {Ponto(-12.5f,-1.0f,-4.0f),Ponto(12.5f,5.0f,-8.0f)};
-std::vector<std::pair<Ponto, Ponto>> listaBlocos;
+float BlocoTamMin = 0.1f;
+Poliedro BoundingBoxJogador;
+Poliedro ParedeInicial = Poliedro(Ponto(-12.5f,-1.0f,-4.0f),Ponto(12.5f,5.0f,-8.0f));
+std::vector<Poliedro> ListaBlocos;
 bool teclaW = false, teclaA = false, teclaS = false, teclaD = false;
 
 // **********************************************************************
@@ -99,12 +100,12 @@ void init(void)
     OBS = Ponto(0,3,10);
     VetorAlvo = ALVO - OBS;
 
-    std::pair<Ponto, Ponto> p1 = {Ponto(13.5f,-1.0f,-4.0f),Ponto(12.5f,5.0f,-8.0f)};
-    std::pair<Ponto, Ponto> p2 = {Ponto(-12.5f,-1.0f,-4.0f),Ponto(-13.5f,5.0f,-8.0f)};
+    Poliedro poli1 = Poliedro(Ponto(13.5f,-1.0f,-4.0f),Ponto(12.5f,5.0f,-8.0f));
+    Poliedro poli2 = Poliedro(Ponto(-12.5f,-1.0f,-4.0f),Ponto(-13.5f,5.0f,-8.0f));
 
-    listaBlocos.push_back(paredeInicial);
-    listaBlocos.push_back(p1);
-    listaBlocos.push_back(p2);
+    ListaBlocos.push_back(ParedeInicial);
+    ListaBlocos.push_back(poli1);
+    ListaBlocos.push_back(poli2);
 
 }
 // **********************************************************************
@@ -247,6 +248,27 @@ void DesenhaChao()
 // **********************************************************************
 //
 // **********************************************************************
+void AtualizaBoundingBoxJogador()
+{
+    float largura = 2.0f * 0.75f;
+    float altura = 2.0f * 0.5f;
+    float profundidade = 2.0f * 1.0f;
+
+    BoundingBoxJogador.setMin(Ponto(
+        PosicaoJogador.x - largura / 2,
+        PosicaoJogador.y - altura / 2,
+        PosicaoJogador.z - profundidade / 2
+    ));
+    BoundingBoxJogador.setMax(Ponto (
+        PosicaoJogador.x + largura / 2,
+        PosicaoJogador.y + altura / 2,
+        PosicaoJogador.z + profundidade / 2
+    ));
+
+}
+// **********************************************************************
+//
+// **********************************************************************
 void DesenhaJogador()
 {
 
@@ -296,11 +318,13 @@ void DesenhaJogador()
             glutSolidCube(1);
         glPopMatrix();
 
+        AtualizaBoundingBoxJogador();
+
         Ponto P;
         P = InstanciaPonto(Ponto(0,0,0), InvCameraMatrix);
         //P = InstanciaPonto(Ponto(0,0,0), OBS, ALVO);
-        PosicaoJogador.imprime("Posicao do Objeto:", "\n");
-        P.imprime("Ponto Instanciado: ", "\n");
+        // PosicaoJogador.imprime("Posicao do Objeto:", "\n");
+        // P.imprime("Ponto Instanciado: ", "\n");
     glPopMatrix();
 }
 // **********************************************************************
@@ -339,9 +363,9 @@ void DesenhaParede()
 
     // DesenhaPoliedro(p1, p2);
 
-    for (int i = 0; i < listaBlocos.size(); i++) {
-        Ponto p1 = listaBlocos[i].first;
-        Ponto p2 = listaBlocos[i].second;
+    for (int i = 0; i < ListaBlocos.size(); i++) {
+        Ponto p1 = ListaBlocos[i].getMin();
+        Ponto p2 = ListaBlocos[i].getMax();
 
         DesenhaPoliedro(p1, p2);
     }
@@ -393,7 +417,7 @@ void DefineLuz(void)
 // **********************************************************************
 // 
 // **********************************************************************
-bool checaColisao(const Poliedro& poliedro1, const Poliedro& poliedro2) {
+bool ChecaColisao(const Poliedro& poliedro1, const Poliedro& poliedro2) {
     Ponto min1 = poliedro1.getMin();
     Ponto max1 = poliedro1.getMax();
 
@@ -407,6 +431,20 @@ bool checaColisao(const Poliedro& poliedro1, const Poliedro& poliedro2) {
 
     // Os cubos colidem se houver sobreposição em todos os eixos
     return colisaoX && colisaoY && colisaoZ;
+}
+// **********************************************************************
+//
+// **********************************************************************
+void VerificaColosoesComBlocos()
+{
+    for (const Poliedro& bloco : ListaBlocos) {
+        if (ChecaColisao(BoundingBoxJogador, bloco)) {
+            CorJogador[0] = 1.0f;
+            CorJogador[1] = 0.0f;
+            CorJogador[2] = 0.0f;
+            cout << "COLISAO" << endl;
+        }
+    }
 }
 // **********************************************************************
 //
@@ -647,6 +685,8 @@ void atualizaMovimento()
     if (teclaD) {
         RotacaoJogador -= rotacao;
     }
+    AtualizaBoundingBoxJogador();
+    VerificaColosoesComBlocos();
     glutPostRedisplay();
 }
 // **********************************************************************
