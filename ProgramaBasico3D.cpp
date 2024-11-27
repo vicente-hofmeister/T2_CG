@@ -36,6 +36,7 @@ using namespace std;
 #include "Instancia.h"
 #include "Tools.h"
 #include "Poliedro.h"
+#include "Modelo3D.h"
 
 Temporizador T;
 double AccumDeltaT=0;
@@ -74,6 +75,8 @@ Poliedro BoundingBoxJogador;
 Poliedro ParedeInicial = Poliedro(Ponto(-12.5f,-1.0f,-4.0f),Ponto(12.5f,5.0f,-8.0f));
 std::vector<Poliedro> ListaBlocos;
 bool teclaW = false, teclaA = false, teclaS = false, teclaD = false;
+Modelo3D vaquinhaModelo = Modelo3D();
+
 
 // **********************************************************************
 //  void init(void)
@@ -99,6 +102,8 @@ void init(void)
     ALVO = Ponto(0, 0, 0);
     OBS = Ponto(0,3,10);
     VetorAlvo = ALVO - OBS;
+
+    vaquinhaModelo.LeObjeto("Vaca.tri");
 
     Poliedro poli1 = Poliedro(Ponto(13.5f,-1.0f,-4.0f),Ponto(12.5f,5.0f,-8.0f));
     Poliedro poli2 = Poliedro(Ponto(-12.5f,-1.0f,-4.0f),Ponto(-13.5f,5.0f,-8.0f));
@@ -552,6 +557,14 @@ void display( void )
     DesenhaChao();
     glPopMatrix();
     
+    glPushMatrix();
+        glTranslatef(0.0f, 2.5f, 0.0f);
+        glScalef(0.1f, 0.1f, 0.1f);
+        glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+		glColor3f(1.0, 0.0, 0.0); // Azul claro
+        vaquinhaModelo.desenhar();
+    glPopMatrix();
+
     DesenhaJogador();
     
     DesenhaParede();

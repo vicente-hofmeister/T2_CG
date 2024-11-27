@@ -142,10 +142,7 @@ void Objeto3D::LeObjeto (char *Nome)
 // **********************************************************************
 void Objeto3D::ExibeObjeto ()
 {
-    // ***************
-    // Exercicio
-    //      complete esta rotina fazendo a exibicao do objeto
-    // ***************
+    
     
     
 }
