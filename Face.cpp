@@ -18,11 +18,15 @@
 #include "Ponto.h"
 
 Ponto P1, P2, P3;
+unsigned int cor;
+int grupo;
 
-Face::Face(Ponto P1, Ponto P2, Ponto P3) {
+Face::Face(Ponto P1, Ponto P2, Ponto P3, unsigned int cor, int grupo) {
     this->P1 = P1;
     this->P2 = P2;
     this->P3 = P3;
+    this->cor = cor;
+    this->grupo = grupo;
 }
 
 Ponto Face::getP1() {
@@ -37,6 +41,14 @@ Ponto Face::getP3() {
     return P3;
 }
 
+unsigned int Face::getCor() {
+    return cor;
+}
+
+int Face::getGrupo() {
+    return grupo;
+}
+
 void Face::setP1(Ponto P1) {
     this->P1 = P1;
 }
@@ -47,4 +59,12 @@ void Face::setP2(Ponto P2) {
 
 void Face::setP3(Ponto P3) {
     this->P3 = P3;
+}
+
+void Face::setCor(unsigned int cor) {
+    this->cor = cor;
+}
+
+void Face::setGrupo(int grupo) {
+    this->grupo = grupo;
 }
