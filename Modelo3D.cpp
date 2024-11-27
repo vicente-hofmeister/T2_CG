@@ -196,3 +196,68 @@ void Modelo3D::DesenharOBJ() const {
     }
     glEnd();
 }
+
+
+bool Modelo3D::LeObjetoOBJAvancado(const char* Nome) {
+    std::ifstream arq(Nome);
+    if (!arq.is_open()) {
+        std::cerr << "Erro ao abrir o arquivo: " << Nome << std::endl;
+        return false;
+    }
+
+    std::vector<Ponto> vertices; // Armazena os vértices
+    std::vector<Ponto> normais;  // Armazena as normais
+    std::vector<Face> facesTemp; // Armazena as faces antes de transferir
+
+    std::string linha;
+    while (std::getline(arq, linha)) {
+        std::istringstream iss(linha);
+
+        if (linha.rfind("v ", 0) == 0) { // Detecta vértices
+            float x, y, z;
+            iss.ignore(2); // Ignora "v "
+            iss >> x >> y >> z;
+            vertices.emplace_back(Ponto(x, y, z));
+        } else if (linha.rfind("vn ", 0) == 0) { // Detecta normais
+            float nx, ny, nz;
+            iss.ignore(3); // Ignora "vn "
+            iss >> nx >> ny >> nz;
+            normais.emplace_back(Ponto(nx, ny, nz));
+        } else if (linha.rfind("f ", 0) == 0) { // Detecta faces
+            int v1, v2, v3;
+            int n1 = -1, n2 = -1, n3 = -1;
+
+            // Processa os índices de vértices e normais
+            std::string v1n1, v2n2, v3n3;
+            iss.ignore(2); // Ignora "f "
+            iss >> v1n1 >> v2n2 >> v3n3;
+
+            // Divide os índices de vértices e normais (ex: "1//1")
+            sscanf(v1n1.c_str(), "%d//%d", &v1, &n1);
+            sscanf(v2n2.c_str(), "%d//%d", &v2, &n2);
+            sscanf(v3n3.c_str(), "%d//%d", &v3, &n3);
+
+            // Ajusta índices para começar em 0
+            v1--; v2--; v3--;
+            n1--; n2--; n3--;
+
+            // Cria a face com vértices e normais (se disponíveis)
+            if (n1 >= 0 && n2 >= 0 && n3 >= 0) {
+                facesTemp.emplace_back(vertices[v1], vertices[v2], vertices[v3], normais[n1]);
+            } else {
+                facesTemp.emplace_back(vertices[v1], vertices[v2], vertices[v3]);
+            }
+        }
+    }
+
+    // Transfere os dados para o modelo 3D
+    nFaces = facesTemp.size();
+    faces = new Face[nFaces];
+    for (unsigned int i = 0; i < nFaces; i++) {
+        faces[i] = facesTemp[i];
+    }
+
+    std::cout << "Modelo carregado com sucesso: " << nFaces << " faces." << std::endl;
+    arq.close();
+    return true;
+}

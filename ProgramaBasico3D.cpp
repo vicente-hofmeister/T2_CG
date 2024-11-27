@@ -104,8 +104,8 @@ void init(void)
     VetorAlvo = ALVO - OBS;
 
     vaquinha.LeObjetoSimples("Vaca.tri");
-    dog.LeObjetoCompleto("dog.tri");
-    leo.LeObjetoOBJ("leo.obj");
+    // dog.LeObjetoCompleto("dog.tri");
+    leo.LeObjetoOBJAvancado("leo.obj");
 
     Poliedro poli1 = Poliedro(Ponto(13.5f,-1.0f,-4.0f),Ponto(12.5f,5.0f,-8.0f));
     Poliedro poli2 = Poliedro(Ponto(-12.5f,-1.0f,-4.0f),Ponto(-13.5f,5.0f,-8.0f));
@@ -567,17 +567,17 @@ void display( void )
     vaquinha.DesenharSimples();
     glPopMatrix();
 
-    glPushMatrix();
-    glTranslatef(3.0f, 2.5f, 0.0f);
-    glScalef(1.0f, 1.0f, 1.0f);
-    dog.DesenharCompleto();
-    glPopMatrix();
+    // glPushMatrix();
+    // glTranslatef(3.0f, 2.5f, 0.0f);
+    // glScalef(1.0f, 1.0f, 1.0f);
+    // dog.DesenharCompleto();
+    // glPopMatrix();
 
-    glPushMatrix();
-    glTranslatef(-3.0f, 2.5f, 0.0f);
-    glScalef(1.0f, 1.0f, 1.0f);
-    leo.DesenharOBJ();
-    glPopMatrix();
+    // glPushMatrix();
+    // glTranslatef(-3.0f, 2.5f, 0.0f);
+    // glScalef(1.0f, 1.0f, 1.0f);
+    // leo.DesenharOBJ();
+    // glPopMatrix();
 
     DesenhaJogador();
     

@@ -24,6 +24,8 @@ public:
     bool LeObjetoOBJ(char* Nome);
     
     void DesenharOBJ() const;
+
+    bool LeObjetoOBJAvancado(const char* Nome);
 };
 
 #endif 
