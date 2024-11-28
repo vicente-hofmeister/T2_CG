@@ -15,19 +15,8 @@ public:
 
     bool LeObjetoSimples(char *Nome);
 
-    bool LeObjetoCompleto(const char *Nome);
-
     void DesenharSimples() const;
 
-    void DesenharCompleto() const;
-
-    bool LeObjetoOBJ(char* Nome);
-    
-    void DesenharOBJ() const;
-
-    bool LeObjetoOBJAvancado(const char* Nome);
-
-    Poliedro CalcularBoundingBoxModelo();
 };
 
 #endif 

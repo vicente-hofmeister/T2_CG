@@ -14,6 +14,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <cmath>
 
 using namespace std;
 
@@ -57,9 +58,10 @@ int ModoDeProjecao = 1;
 // A funcao "Init" utiliza esta variavel. O valor dela eh alterado
 // pela tecla 'e'
 int ModoDeExibicao = 1;
-double nFrames = 0;
-double TempoTotal = 0;
-Ponto CantoEsquerdo = Ponto(-20, 0, -10);
+
+double nFrames=0;
+double TempoTotal=0;
+Ponto CantoEsquerdo = Ponto(-12.5,0,-25);
 Ponto OBS;
 Ponto ALVO;
 Ponto VetorAlvo;
@@ -71,8 +73,16 @@ float RotacaoJogador = 0.0f;
 float movimento = 0.1f;
 float rotacao = 1.75f;
 float anguloCanhao = 0.0f;
-float DistanciaCamera = 3.0f;
-float AlturaCamera = 1.5f;
+Ponto CentroCanhao = Ponto();
+Ponto PontaCanhao = Ponto();
+Ponto DirecaoCanhao = Ponto();
+bool PewPewNoAr = false;
+Ponto PosicaoPewPew = Ponto();
+Ponto DirecaoPewPew = Ponto();
+float ForcaPewPew = 0.75f;
+float Gravidade = 0.05f;
+float DistanciaCamera = 4.0f;
+float AlturaCamera = 2.5f;
 float CorJogador[3] = {0.75f, 0.75f, 0.0f};
 float BlocoTamMin = 0.1f;
 Poliedro BoundingBoxJogador;
@@ -87,6 +97,7 @@ Modelo3D dog = Modelo3D();
 Modelo3D leo = Modelo3D();
 GLuint TEX1;
 GLuint TEX2;
+bool paredao[25][15];
 // **********************************************************************
 //  void init(void)
 //        Inicializa os parametros globais de OpenGL
@@ -109,7 +120,14 @@ void init(void)
     glShadeModel(GL_SMOOTH);
     // glShadeModel(GL_FLAT);
 
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    for (int i = 0; i < 25; i++) {
+        for (int j = 0; j < 15; j++) {
+            paredao[i][j] = true;
+        }
+    }
+    
+    glColorMaterial ( GL_FRONT, GL_AMBIENT_AND_DIFFUSE );
+
     if (ModoDeExibicao) // Faces Preenchidas??
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     else
@@ -122,8 +140,7 @@ void init(void)
     Poliedro poli2 = Poliedro(Ponto(-13.5f, -1.0f, -8.0f), Ponto(-12.5f, 5.0f, -4.0f));
 
     vaquinha.LeObjetoSimples("Vaca.tri");
-    // dog.LeObjetoCompleto("dog.tri");
-    leo.LeObjetoOBJAvancado("leo.obj");
+    dog.LeObjetoSimples("dog.tri");
 
     BoundingBoxVaquinha = vaquinha.CalcularBoundingBoxModelo();
     glm::mat4 transform = glm::mat4(1.0f);
@@ -234,10 +251,12 @@ void DesenhaPiso()
     srand(100); // usa uma semente fixa para gerar sempre as mesma cores no piso
     glPushMatrix();
     glTranslated(CantoEsquerdo.x, CantoEsquerdo.y, CantoEsquerdo.z);
-    for (int x = -20; x < 20; x++)
+
+    for(int x = -12.5; x < 12.5;x++)
     {
         glPushMatrix();
-        for (int z = -20; z < 20; z++)
+        for(int z = -25; z < 25;z++)
+
         {
             DesenhaLadrilho(MediumGoldenrod, rand() % 40);
             glTranslated(0, 0, 1);
@@ -252,10 +271,16 @@ void DesenhaPiso()
 // **********************************************************************
 void DesenhaParedao()
 {
-    glPushMatrix();
-    glRotatef(90, 0, 0, 1);
-    DesenhaPiso();
-    glPopMatrix();
+    for (int i = 0; i < 25; i++) {
+        for (int j = 0; j < 15; j++) {
+            if (paredao[i][j]) {
+                glPushMatrix();
+                    glTranslatef(i - 12.5, j, 0);
+                    DesenhaCubo(1);
+                glPopMatrix();
+            }
+        }
+    }
 }
 // **********************************************************************
 //
@@ -263,12 +288,7 @@ void DesenhaParedao()
 void DesenhaChao()
 {
     glPushMatrix();
-    glTranslated(-20, 0, 0);
-    DesenhaPiso();
-    glPopMatrix();
-    glPushMatrix();
-    glTranslated(20, 0, 0);
-    DesenhaPiso();
+        DesenhaPiso();
     glPopMatrix();
 }
 // **********************************************************************
@@ -292,9 +312,23 @@ void AtualizaBoundingBoxJogador()
 // **********************************************************************
 //
 // **********************************************************************
+void CalculaNormalECentroCanhao() {
+    CentroCanhao.x = PosicaoJogador.x;
+    CentroCanhao.y = PosicaoJogador.y + 0.95f;
+    CentroCanhao.z = PosicaoJogador.z;
+
+    DirecaoCanhao = Ponto(0,0,-1);
+    DirecaoCanhao.rotacionaX(anguloCanhao);
+    DirecaoCanhao.rotacionaY(RotacaoJogador);
+
+    PontaCanhao = CentroCanhao + DirecaoCanhao * 1.5;
+
+}
+// **********************************************************************
+//
+// **********************************************************************
 void DesenhaJogador()
 {
-
     glPushMatrix(); // Jogador
     glTranslatef(PosicaoJogador.x, PosicaoJogador.y, PosicaoJogador.z);
     glRotatef(RotacaoJogador, 0.0f, 1.0f, 0.0f);
@@ -310,18 +344,19 @@ void DesenhaJogador()
 
     GLUquadric *quad = gluNewQuadric();
     glPushMatrix(); // Canhao
-    glTranslatef(0.0f, 0.25f, -0.25f);
-    glRotatef(anguloCanhao, 1.0f, 0.0f, 0.0f);
-    glTranslatef(0.0f, 0.0f, -1.5f);
+        glTranslatef(0.0f, 0.25f, 0.0f);
+        glRotatef(anguloCanhao, 1.0f, 0.0f, 0.0f);
+        glTranslatef(0.0f, 0.0f, -2.5f);
 
-    glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
-    gluCylinder(quad, 0.3f, 0.15f, 1.5f, 10, 10);
+        glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
+        gluCylinder(quad, 0.3f, 0.15f, 2.5f, 10, 10);
 
-    glPushMatrix();
-    glColor3b(0.0f, 0.0f, 0.0f);
-    glRotatef(180, 1.0f, 0.0f, 0.0f); // Inverte para alinhar com a base
-    gluDisk(quad, 0.0, 0.3, 10, 1);   // Desenha o disco da base
-    glPopMatrix();
+        glPushMatrix();
+            glColor3b(0.0f, 0.0f, 0.0f);
+            glRotatef(180, 1.0f, 0.0f, 0.0f); // Inverte para alinhar com a base
+            CalculaNormalECentroCanhao();
+            gluDisk(quad, 0.0, 0.3, 10, 1); // Desenha o disco da base
+        glPopMatrix();
     glPopMatrix();
     gluDeleteQuadric(quad);
 
@@ -387,6 +422,7 @@ void DesenhaParede()
     // Ponto p2 = Ponto(4.0f,3.5f,2.0f);
 
     // DesenhaPoliedro(p1, p2);
+    glColor3f(0.5, 0.5, 0.5); // Azul claro
 
     for (int i = 0; i < ListaBlocos.size(); i++)
     {
@@ -440,7 +476,20 @@ void DefineLuz(void)
     glMateriali(GL_FRONT, GL_SHININESS, 128);
 }
 // **********************************************************************
-//
+//  void DefineLuz(void)
+// **********************************************************************
+void CalculaPoliedroParaEsfera(const Ponto& centro, float raio, Poliedro& poliedro) {
+    // Calcula os pontos min e max
+    Ponto pontoMin(centro.x - raio, centro.y - raio, centro.z - raio);
+    Ponto pontoMax(centro.x + raio, centro.y + raio, centro.z + raio);
+
+    // Define o poliedro com os pontos calculados
+    poliedro.setMin(pontoMin);
+    poliedro.setMax(pontoMax);
+}
+// **********************************************************************
+// 
+
 // **********************************************************************
 bool ChecaColisao(const Poliedro &poliedro1, const Poliedro &poliedro2)
 {
@@ -464,6 +513,52 @@ bool ChecaColisao(const Poliedro &poliedro1, const Poliedro &poliedro2)
 
     // Os cubos colidem se houver sobreposição em todos os eixos
     return colisaoX && colisaoY && colisaoZ;
+}
+// **********************************************************************
+//
+// **********************************************************************
+bool ChecaColisaoPewPew() {
+    if (PosicaoPewPew.y <= 0.0f) { // Verifica colisão com o chão
+        PewPewNoAr = false;
+        return true;
+    }
+
+    Poliedro PPewPew = Poliedro(PosicaoPewPew, PosicaoPewPew);
+
+    for (int i = 0; i < 25; i++) {
+        for (int j = 0; j < 15; j++) {
+            if (paredao[i][j]) {
+                // Calcula posição do bloco com base nos índices
+                float x = i - 12.5f;
+                float y = j;
+                float z = 0.0f;
+
+                Ponto pontoMin(x - 0.5f, y - 0.5f, z - 0.5f);
+                Ponto pontoMax(x + 0.5f, y + 0.5f, z + 0.5f);
+                Poliedro PParede = Poliedro(pontoMin, pontoMax);
+
+                // Verifica colisão com o bloco
+                if (ChecaColisao(PPewPew, PParede)) {
+                    PewPewNoAr = false;
+
+                    // Remove o bloco atingido e os 8 ao redor
+                    for (int k = -1; k <= 1; k++) {
+                        for (int l = -1; l <= 1; l++) {
+                            int ni = i + k;
+                            int nj = j + l;
+
+                            // Certifica-se de que está dentro dos limites
+                            if (ni >= 0 && ni < 25 && nj >= 0 && nj < 15) {
+                                paredao[ni][nj] = false;
+                            }
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 // **********************************************************************
@@ -615,6 +710,39 @@ void reshape(int w, int h)
     PosicUser();
 }
 // **********************************************************************
+//
+// **********************************************************************
+void PewPew() {
+    PewPewNoAr = true;
+    CalculaNormalECentroCanhao();
+    PosicaoPewPew = PontaCanhao;
+    DirecaoPewPew = DirecaoCanhao * ForcaPewPew;
+}
+// **********************************************************************
+//
+// **********************************************************************
+void MovePewPew() {
+    if (PewPewNoAr) {
+        DirecaoPewPew.y -= Gravidade;
+        PosicaoPewPew = PosicaoPewPew + DirecaoPewPew;
+
+        if (ChecaColisaoPewPew()) {
+            PewPewNoAr = false;
+        }
+    }
+}
+// **********************************************************************
+//
+// **********************************************************************
+void DesenhaPewPew() {
+    MovePewPew();
+    glPushMatrix();
+    glTranslatef(PosicaoPewPew.x, PosicaoPewPew.y, PosicaoPewPew.z);
+    glColor3f(0.7f, 0.7f, 0.7f);
+    glutSolidSphere(0.15f, 10, 10);
+    glPopMatrix();
+}
+// **********************************************************************
 //  void display( void )
 // **********************************************************************
 void display(void)
@@ -631,6 +759,7 @@ void display(void)
     glPushMatrix();
     glTranslatef(0, -1, 0);
     DesenhaChao();
+    DesenhaParedao();
     glPopMatrix();
 
     glPushMatrix();
@@ -642,20 +771,22 @@ void display(void)
     glPopMatrix();
 
     // glPushMatrix();
-    // glTranslatef(3.0f, 2.5f, 0.0f);
-    // glScalef(1.0f, 1.0f, 1.0f);
-    // dog.DesenharCompleto();
+    // glTranslatef(0.0f, 2.5f, 0.0f);
+    // glScalef(0.1f, 0.10f, 0.10f);
+    // glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+    // glColor3f(1.0, 0.0, 0.0);
+    // vaquinha.DesenharSimples();
     // glPopMatrix();
 
-    glPushMatrix();
-    glTranslatef(-3.0f, 2.5f, 0.0f);
-    glScalef(1.0f, 1.0f, 1.0f);
-    leo.DesenharSimples();
-    glPopMatrix();
-
+    // glPushMatrix();
+    // glTranslatef(3.0f, 0.5f, 0.0f);
+    // glScalef(0.2f, 0.2f, 0.2f);
+    // dog.DesenharSimples();
+    // glPopMatrix();
     DesenhaJogador();
+    ChecaColisaoPewPew();
+    DesenhaPewPew();
 
-    DesenhaParede();
 
     glPushMatrix();
     glTranslatef(-4.0f, 0.0f, 2.0f);
@@ -704,44 +835,59 @@ void keyboard(unsigned char key, int x, int y)
 
     switch (key)
     {
-    case 27:     // Termina o programa qdo
-        exit(0); // a tecla ESC for pressionada
-        break;
-    case 'w':
-        teclaW = true;
-        break;
-    case 's':
-        teclaS = true;
-        break;
-    case 'a':
-        teclaA = true;
-        break;
-    case 'd':
-        teclaD = true;
-        break;
-    case 'r':
-        if (anguloCanhao < 50.0f)
-            anguloCanhao += 2.5f;
-        break;
-    case 'f':
-        if (anguloCanhao > -10.0f)
-            anguloCanhao -= 2.5f;
-        break;
-    case 'p':
-        if (ModoDeProjecao == 0)
-            ModoDeProjecao = 1;
-        else if (ModoDeProjecao == 1)
-            ModoDeProjecao = 2;
-        else
-            ModoDeProjecao = 0;
-
-        break;
-    case 'o':
-        ModoDeExibicao = !ModoDeExibicao;
-        init();
-        break;
-    default:
-        cout << key;
+        case 27:        // Termina o programa qdo
+            exit ( 0 );   // a tecla ESC for pressionada
+            break;
+        case 'w':
+            teclaW = true;
+            break;
+        case 's':
+            teclaS = true;
+            break;
+        case 'a':
+            teclaA = true;
+            break;
+        case 'd':
+            teclaD = true;
+            break;
+        case 'r':
+            if (anguloCanhao < 50.0f)
+                anguloCanhao += 2.5f; 
+            break;
+        case 'f':
+            if (anguloCanhao > -10.0f)
+                anguloCanhao -= 2.5f;
+            break;
+        case 'e':
+            if (ForcaPewPew == 0.75f)
+                ForcaPewPew = 1.0f;
+            else if (ForcaPewPew == 1.0f)
+                ForcaPewPew = 1.25f;
+            else if (ForcaPewPew == 1.25f)
+                ForcaPewPew = 1.5f;
+            else if (ForcaPewPew == 1.5f)
+                ForcaPewPew = 0.5f;
+            else 
+                ForcaPewPew = 0.75f;
+            break;
+        case ' ':
+            PewPew();
+            break;
+        case 'p':
+            if (ModoDeProjecao == 0)
+                ModoDeProjecao = 1;
+            else if (ModoDeProjecao == 1)
+                ModoDeProjecao = 2;
+            else 
+                ModoDeProjecao = 0;
+                
+            break;
+        case 'o':
+            ModoDeExibicao = !ModoDeExibicao;
+            init();
+            break;
+        default:
+                cout << key;
         break;
     }
     glutPostRedisplay();
