@@ -106,7 +106,7 @@ void init(void)
     Poliedro poli1 = Poliedro(Ponto(12.5f,-1.0f,-8.0f ),Ponto(13.5f,5.0f,-4.0f));
     Poliedro poli2 = Poliedro(Ponto(-13.5f,-1.0f,-8.0f),Ponto(-12.5f,5.0f,-4.0f));
 
-    vaquinha.LeObjeto("Vaca.tri");
+    vaquinha.LeObjetoSimples("Vaca.tri");
     // dog.LeObjetoCompleto("dog.tri");
     leo.LeObjetoOBJAvancado("leo.obj");
 
