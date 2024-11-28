@@ -371,8 +371,10 @@ void DesenhaPoliedro(Ponto p1, Ponto p2)
     glPushMatrix();
     glTranslatef(centralX, centralY, centralZ);
     glScalef(lengthX, lengthY, lengthZ);
+    glPopMatrix();
     glutSolidCube(1);
     glBindTexture (GL_TEXTURE_2D, TEX1);
+    glPopMatrix();
     glEnd();
     glPopMatrix();
 }
