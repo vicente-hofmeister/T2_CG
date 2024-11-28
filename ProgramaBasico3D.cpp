@@ -72,7 +72,7 @@ float AlturaCamera = 1.5f;
 float CorJogador[3] = {0.75f, 0.75f, 0.0f};
 float BlocoTamMin = 0.1f;
 Poliedro BoundingBoxJogador;
-Poliedro ParedeInicial = Poliedro(Ponto(-12.5f,-1.0f,-4.0f),Ponto(12.5f,5.0f,-8.0f));
+Poliedro ParedeInicial = Poliedro(Ponto(-12.5f,-1.0f,-8.0f),Ponto(12.5f,5.0f,-4.0f));
 std::vector<Poliedro> ListaBlocos;
 bool teclaW = false, teclaA = false, teclaS = false, teclaD = false;
 Modelo3D vaquinha = Modelo3D();
@@ -103,12 +103,13 @@ void init(void)
     OBS = Ponto(0,3,10);
     VetorAlvo = ALVO - OBS;
 
-    vaquinha.LeObjetoSimples("Vaca.tri");
+    Poliedro poli1 = Poliedro(Ponto(12.5f,-1.0f,-8.0f ),Ponto(13.5f,5.0f,-4.0f));
+    Poliedro poli2 = Poliedro(Ponto(-13.5f,-1.0f,-8.0f),Ponto(-12.5f,5.0f,-4.0f));
+
+    vaquinha.LeObjeto("Vaca.tri");
     // dog.LeObjetoCompleto("dog.tri");
     leo.LeObjetoOBJAvancado("leo.obj");
 
-    Poliedro poli1 = Poliedro(Ponto(13.5f,-1.0f,-4.0f),Ponto(12.5f,5.0f,-8.0f));
-    Poliedro poli2 = Poliedro(Ponto(-12.5f,-1.0f,-4.0f),Ponto(-13.5f,5.0f,-8.0f));
 
     ListaBlocos.push_back(ParedeInicial);
     ListaBlocos.push_back(poli1);
@@ -436,16 +437,28 @@ bool ChecaColisao(const Poliedro& poliedro1, const Poliedro& poliedro2) {
     bool colisaoY = !(max1.y < min2.y || max2.y < min1.y);
     bool colisaoZ = !(max1.z < min2.z || max2.z < min1.z);
 
+    cout << "Jogador: Min(" << min1.x << ", " << min1.y << ", " << min1.z << ") "
+     << "Max(" << max1.x << ", " << max1.y << ", " << max1.z << ")" << endl;
+    cout << "Bloco: Min(" << min2.x << ", " << min2.y << ", " << min2.z << ") "
+     << "Max(" << max2.x << ", " << max2.y << ", " << max2.z << ")" << endl;
+
+    cout << "colisaoX:" << colisaoX << ", " << "colisaoY:" << colisaoY << ", " << "colisaoZ:" << colisaoZ << ")" << endl;
+
     // Os cubos colidem se houver sobreposição em todos os eixos
     return colisaoX && colisaoY && colisaoZ;
 }
+
 // **********************************************************************
 //
 // **********************************************************************
 void VerificaColosoesComBlocos()
 {
+    int i = 0;
     for (const Poliedro& bloco : ListaBlocos) {
-        if (ChecaColisao(BoundingBoxJogador, bloco)) {
+        bool achouColisao = ChecaColisao(BoundingBoxJogador, bloco);
+        cout << "achouColisao: " << achouColisao << endl;
+
+        if (achouColisao) {
             CorJogador[0] = 1.0f;
             CorJogador[1] = 0.0f;
             CorJogador[2] = 0.0f;
