@@ -12,6 +12,7 @@
 #include <cmath>
 #include <ctime>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
@@ -67,6 +68,9 @@ float RotacaoJogador = 0.0f;
 float movimento = 0.1f;
 float rotacao = 1.75f;
 float anguloCanhao = 0.0f;
+Ponto CentroCanhao = Ponto();
+Ponto NormalCanhao = Ponto();
+bool desenhaLinha = false;
 float DistanciaCamera = 3.0f;
 float AlturaCamera = 1.5f;
 float CorJogador[3] = {0.75f, 0.75f, 0.0f};
@@ -276,9 +280,24 @@ void AtualizaBoundingBoxJogador()
 // **********************************************************************
 //
 // **********************************************************************
+void CalculaNormalECentroCanhao() {
+    CentroCanhao.x = PosicaoJogador.x;
+    CentroCanhao.y = PosicaoJogador.y + 0.95f;
+    CentroCanhao.z = PosicaoJogador.z;
+
+    Ponto Direcao = Ponto(0,0,-1);
+
+    Direcao.rotacionaX(anguloCanhao);
+    Direcao.rotacionaY(RotacaoJogador);
+
+    NormalCanhao = CentroCanhao + Direcao * 3.0;
+
+}
+// **********************************************************************
+//
+// **********************************************************************
 void DesenhaJogador()
 {
-
     glPushMatrix(); // Jogador
         glTranslatef ( PosicaoJogador.x, PosicaoJogador.y, PosicaoJogador.z );
         glRotatef(RotacaoJogador, 0.0f, 1.0f, 0.0f);
@@ -294,16 +313,17 @@ void DesenhaJogador()
 
             GLUquadric *quad = gluNewQuadric();
             glPushMatrix(); // Canhao
-                glTranslatef(0.0f, 0.25f, -0.25f);
+                glTranslatef(0.0f, 0.25f, 0.0f);
                 glRotatef(anguloCanhao, 1.0f, 0.0f, 0.0f);
-                glTranslatef(0.0f, 0.0f, -1.5f);
+                glTranslatef(0.0f, 0.0f, -2.5f);
 
                 glColor3f(CorJogador[0], CorJogador[1], CorJogador[2]);
-                gluCylinder(quad, 0.3f, 0.15f, 1.5f, 10, 10);
+                gluCylinder(quad, 0.3f, 0.15f, 2.5f, 10, 10);
 
                 glPushMatrix();
                     glColor3b(0.0f, 0.0f, 0.0f);
                     glRotatef(180, 1.0f, 0.0f, 0.0f); // Inverte para alinhar com a base
+                    CalculaNormalECentroCanhao();
                     gluDisk(quad, 0.0, 0.3, 10, 1); // Desenha o disco da base
                 glPopMatrix();
             glPopMatrix();
@@ -369,6 +389,7 @@ void DesenhaParede()
     // Ponto p2 = Ponto(4.0f,3.5f,2.0f);
 
     // DesenhaPoliedro(p1, p2);
+    glColor3f(0.5, 0.5, 0.5); // Azul claro
 
     for (int i = 0; i < ListaBlocos.size(); i++) {
         Ponto p1 = ListaBlocos[i].getMin();
@@ -552,6 +573,18 @@ void reshape( int w, int h )
 
 }
 // **********************************************************************
+//
+// **********************************************************************
+void DesenhaNormalCanhao() {
+    if (desenhaLinha) {
+                glColor3f(1.0f, 0.0f, 0.0f); // Vermelho para destacar a normal
+        glBegin(GL_LINES);
+            glVertex3f(CentroCanhao.x, CentroCanhao.y, CentroCanhao.z); // Origem
+            glVertex3f(NormalCanhao.x, NormalCanhao.y, NormalCanhao.z);             // Destino
+        glEnd();
+    }
+}
+// **********************************************************************
 //  void display( void )
 // **********************************************************************
 void display( void )
@@ -570,22 +603,22 @@ void display( void )
     DesenhaChao();
     glPopMatrix();
     
-    glPushMatrix();
-    glTranslatef(0.0f, 2.5f, 0.0f);
-    glScalef(0.1f, 0.10f, 0.10f);
-    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-    glColor3f(1.0, 0.0, 0.0);
-    vaquinha.DesenharSimples();
-    glPopMatrix();
+    // glPushMatrix();
+    // glTranslatef(0.0f, 2.5f, 0.0f);
+    // glScalef(0.1f, 0.10f, 0.10f);
+    // glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+    // glColor3f(1.0, 0.0, 0.0);
+    // vaquinha.DesenharSimples();
+    // glPopMatrix();
 
-    glPushMatrix();
-    glTranslatef(3.0f, 0.5f, 0.0f);
-    glScalef(0.2f, 0.2f, 0.2f);
-    dog.DesenharSimples();
-    glPopMatrix();
+    // glPushMatrix();
+    // glTranslatef(3.0f, 0.5f, 0.0f);
+    // glScalef(0.2f, 0.2f, 0.2f);
+    // dog.DesenharSimples();
+    // glPopMatrix();
 
     DesenhaJogador();
-    
+    DesenhaNormalCanhao();
     DesenhaParede();
 
 	glPushMatrix(); 
@@ -657,6 +690,9 @@ void keyboard ( unsigned char key, int x, int y )
         case 'f':
             if (anguloCanhao > -10.0f)
                 anguloCanhao -= 2.5f;
+            break;
+        case ' ':
+            desenhaLinha = !desenhaLinha;
             break;
         case 'p':
             if (ModoDeProjecao == 0)
