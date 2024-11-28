@@ -17,6 +17,7 @@ public:
 
     void DesenharSimples() const;
 
+    Poliedro CalcularBoundingBoxModelo();
 };
 
 #endif 

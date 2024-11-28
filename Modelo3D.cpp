@@ -19,6 +19,7 @@
 
 #include "Ponto.h"
 #include "Face.h"
+#include "Poliedro.h"
 #include <vector>
 #include <sstream>
 
@@ -64,50 +65,6 @@ bool Modelo3D::LeObjetoSimples(char *Nome)
     return true;
 }
 
-
-bool Modelo3D::LeObjetoCompleto(const char *Nome)
-{
-    ifstream arq;
-    arq.open(Nome, ios::in);
-    if (!arq)
-    {
-        cout << "Erro na abertura do arquivo " << Nome << "." << endl;
-        return false;
-    }
-    int nGrupos, nText;
-    char tipo;
-    arq >> tipo;
-    arq >> nFaces;
-    arq >> nGrupos >> nText;
-
-    faces = new Face[nFaces];
-
-    for (int i = 0; i < nFaces; i++)
-    {
-        float x, y, z;
-        unsigned int cor;
-        int grupo = -1;
-
-        // Le os tres vertices
-        arq >> x >> y >> z; // Vertice 1
-        faces[i].setP1(Ponto(x, y, z));
-        arq >> x >> y >> z; // Vertice 2
-        faces[i].setP2(Ponto(x, y, z));
-        arq >> x >> y >> z; // Vertice 3
-        faces[i].setP3(Ponto(x, y, z));
-
-        arq >> std::hex >> cor;
-        faces[i].setCor(cor);
-
-        if (!(arq >> grupo))
-        {                // Tenta ler o grupo, se não existir mantém o padrão
-            arq.clear(); // Limpa o estado de erro
-        }
-        faces[i].setGrupo(grupo);
-    }
-    return true;
-}
-
 void Modelo3D::DesenharSimples() const
 {
     glBegin(GL_TRIANGLES);
@@ -146,3 +103,43 @@ void Modelo3D::DesenharSimples() const
     glEnd();
 }
 
+Poliedro Modelo3D::CalcularBoundingBoxModelo()
+{
+    float MinX = std::numeric_limits<float>::max();
+    float MinY = std::numeric_limits<float>::max();
+    float MinZ = std::numeric_limits<float>::max();
+
+    float MaxX = std::numeric_limits<float>::lowest();
+    float MaxY = std::numeric_limits<float>::lowest();
+    float MaxZ = std::numeric_limits<float>::lowest();
+
+    boundingBox.setMin(Ponto(MinX, MinY, MinZ));
+    boundingBox.setMax(Ponto(MaxX, MaxY, MaxZ));
+
+    for (unsigned int i = 0; i < nFaces; i++)
+    {
+        Face &face = faces[i];
+
+        Ponto p1 = face.getP1();
+        Ponto p2 = face.getP2();
+        Ponto p3 = face.getP3();
+
+        // Poliedro boundingBoxFace = face.CalcularBoundingBox();
+
+        Ponto minBBox = boundingBox.getMin();
+        Ponto maxBBox = boundingBox.getMax();
+
+        // Ponto minFace = boundingBoxFace.getMin();
+        // Ponto maxFace = boundingBoxFace.getMax();
+
+        boundingBox.setMin(Ponto(std::min(minBBox.x, std::min(p1.x, std::min(p2.x, p3.x))),
+                                 std::min(minBBox.y, std::min(p1.y, std::min(p2.y, p3.y))),
+                                 std::min(minBBox.z, std::min(p1.z, std::min(p2.z, p3.z)))));
+
+        boundingBox.setMax(Ponto(std::max(maxBBox.x, std::max(p1.x, std::max(p2.x, p3.x))),
+                                 std::max(maxBBox.y, std::max(p1.y, std::max(p2.y, p3.y))),
+                                 std::max(maxBBox.z, std::max(p1.z, std::max(p2.z, p3.z)))));
+    }
+
+    return boundingBox;
+}
