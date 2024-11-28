@@ -57,7 +57,7 @@ int ModoDeProjecao = 1;
 int ModoDeExibicao = 1;
 double nFrames=0;
 double TempoTotal=0;
-Ponto CantoEsquerdo = Ponto(-20,0,-10);
+Ponto CantoEsquerdo = Ponto(-12.5,0,-25);
 Ponto OBS;
 Ponto ALVO;
 Ponto VetorAlvo;
@@ -86,7 +86,7 @@ std::vector<Poliedro> ListaBlocos;
 bool teclaW = false, teclaA = false, teclaS = false, teclaD = false;
 Modelo3D vaquinha = Modelo3D();
 Modelo3D dog = Modelo3D();
-Modelo3D leo = Modelo3D();
+bool paredao[25][15];
 // **********************************************************************
 //  void init(void)
 //        Inicializa os parametros globais de OpenGL
@@ -102,6 +102,12 @@ void init(void)
     glEnable(GL_NORMALIZE);
     glShadeModel(GL_SMOOTH);
     //glShadeModel(GL_FLAT);
+
+    for (int i = 0; i < 25; i++) {
+        for (int j = 0; j < 15; j++) {
+            paredao[i][j] = true;
+        }
+    }
 
     glColorMaterial ( GL_FRONT, GL_AMBIENT_AND_DIFFUSE );
     if (ModoDeExibicao) // Faces Preenchidas??
@@ -224,10 +230,10 @@ void DesenhaPiso()
     srand(100); // usa uma semente fixa para gerar sempre as mesma cores no piso
     glPushMatrix();
     glTranslated(CantoEsquerdo.x, CantoEsquerdo.y, CantoEsquerdo.z);
-    for(int x=-20; x<20;x++)
+    for(int x = -12.5; x < 12.5;x++)
     {
         glPushMatrix();
-        for(int z=-20; z<20;z++)
+        for(int z = -25; z < 25;z++)
         {
             DesenhaLadrilho(MediumGoldenrod, rand()%40);
             glTranslated(0, 0, 1);
@@ -242,10 +248,17 @@ void DesenhaPiso()
 // **********************************************************************
 void DesenhaParedao()
 {
-    glPushMatrix();
-    glRotatef(90, 0, 0, 1);
-        DesenhaPiso();
-    glPopMatrix();
+    for (int i = 0; i < 25; i++) {
+        for (int j = 0; j < 15; j++) {
+            if (paredao[i][j]) {
+                glPushMatrix();
+                    glTranslatef(i - 12.5, j, 0);
+                    DesenhaCubo(1);
+                glPopMatrix();
+            }
+        }
+    }
+    
 }
 // **********************************************************************
 //
@@ -253,11 +266,6 @@ void DesenhaParedao()
 void DesenhaChao()
 {
     glPushMatrix();
-        glTranslated(-20, 0, 0);
-        DesenhaPiso();
-    glPopMatrix();
-    glPushMatrix();
-        glTranslated(20, 0, 0);
         DesenhaPiso();
     glPopMatrix();
 }
@@ -622,6 +630,7 @@ void display( void )
     glPushMatrix();
     glTranslatef(0, -1, 0);
     DesenhaChao();
+    DesenhaParedao();
     glPopMatrix();
     
     // glPushMatrix();
@@ -639,7 +648,6 @@ void display( void )
     // glPopMatrix();
     DesenhaJogador();
     DesenhaPewPew();
-    DesenhaParede();
 
 	glPushMatrix(); 
 		glTranslatef ( -4.0f, 0.0f, 2.0f );
