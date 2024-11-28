@@ -6,6 +6,7 @@
                 "${workspaceFolder}/**",
                 "/usr/include",
                 "/usr/include/GL",
+                "/usr/include/glm",
                 "/usr/local/include"
             ],
             "compilerPath": "/usr/bin/g++",

@@ -26,6 +26,8 @@ public:
     void DesenharOBJ() const;
 
     bool LeObjetoOBJAvancado(const char* Nome);
+
+    Poliedro CalcularBoundingBoxModelo();
 };
 
 #endif 

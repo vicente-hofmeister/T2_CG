@@ -24,17 +24,21 @@
 
 Face *faces;
 unsigned int nFaces;
+Poliedro boundingBox;
 
-bool Modelo3D::LeObjetoSimples(char *Nome) {
+bool Modelo3D::LeObjetoSimples(char *Nome)
+{
     ifstream arq;
     arq.open(Nome, ios::in);
-    if (!arq) {
+    if (!arq)
+    {
         cout << "Erro na abertura do arquivo " << Nome << "." << endl;
         return false;
     }
 
     arq >> nFaces;
-    if (nFaces <= 0) {
+    if (nFaces <= 0)
+    {
         cout << "Erro: Número inválido de faces no arquivo." << endl;
         return false;
     }
@@ -42,9 +46,10 @@ bool Modelo3D::LeObjetoSimples(char *Nome) {
     faces = new Face[nFaces]; // Aloca memória para as faces
 
     float x, y, z;
-    for (int i = 0; i < nFaces; i++) {
+    for (int i = 0; i < nFaces; i++)
+    {
         // Lê os três vértices
-        arq >> x >> y >> z; 
+        arq >> x >> y >> z;
         Ponto p1(x, y, z);
 
         arq >> x >> y >> z;
@@ -59,7 +64,8 @@ bool Modelo3D::LeObjetoSimples(char *Nome) {
     return true;
 }
 
-bool Modelo3D::LeObjetoCompleto(const char *Nome) {
+bool Modelo3D::LeObjetoCompleto(const char *Nome)
+{
     ifstream arq;
     arq.open(Nome, ios::in);
     if (!arq)
@@ -74,10 +80,10 @@ bool Modelo3D::LeObjetoCompleto(const char *Nome) {
     arq >> nGrupos >> nText;
 
     faces = new Face[nFaces];
-    
-    for (int i=0;i<nFaces;i++)
+
+    for (int i = 0; i < nFaces; i++)
     {
-        float x,y,z;
+        float x, y, z;
         unsigned int cor;
         int grupo = -1;
 
@@ -88,21 +94,24 @@ bool Modelo3D::LeObjetoCompleto(const char *Nome) {
         faces[i].setP2(Ponto(x, y, z));
         arq >> x >> y >> z; // Vertice 3
         faces[i].setP3(Ponto(x, y, z));
-        
+
         arq >> std::hex >> cor;
         faces[i].setCor(cor);
 
-        if (!(arq >> grupo)) { // Tenta ler o grupo, se não existir mantém o padrão
-            arq.clear();       // Limpa o estado de erro
+        if (!(arq >> grupo))
+        {                // Tenta ler o grupo, se não existir mantém o padrão
+            arq.clear(); // Limpa o estado de erro
         }
         faces[i].setGrupo(grupo);
     }
     return true;
 }
 
-void Modelo3D::DesenharSimples() const {
+void Modelo3D::DesenharSimples() const
+{
     glBegin(GL_TRIANGLES);
-    for (unsigned int i = 0; i < nFaces; i++) {
+    for (unsigned int i = 0; i < nFaces; i++)
+    {
         // Obtenha os vértices da face atual
         Ponto v1 = faces[i].getP1();
         Ponto v2 = faces[i].getP2();
@@ -116,9 +125,11 @@ void Modelo3D::DesenharSimples() const {
     glEnd();
 }
 
-void Modelo3D::DesenharCompleto() const {
+void Modelo3D::DesenharCompleto() const
+{
     glBegin(GL_TRIANGLES);
-    for (unsigned int i = 0; i < nFaces; i++) {
+    for (unsigned int i = 0; i < nFaces; i++)
+    {
         // Obtenha os vértices da face atual
         Ponto v1 = faces[i].getP1();
         Ponto v2 = faces[i].getP2();
@@ -139,10 +150,12 @@ void Modelo3D::DesenharCompleto() const {
     glEnd();
 }
 
-bool Modelo3D::LeObjetoOBJ(char *Nome) {
+bool Modelo3D::LeObjetoOBJ(char *Nome)
+{
     ifstream arq;
     arq.open(Nome, ios::in);
-    if (!arq) {
+    if (!arq)
+    {
         cout << "Erro na abertura do arquivo " << Nome << "." << endl;
         return false;
     }
@@ -152,12 +165,16 @@ bool Modelo3D::LeObjetoOBJ(char *Nome) {
     string linha;
 
     // Lê o arquivo linha por linha
-    while (getline(arq, linha)) {
-        if (linha.rfind("v ", 0) == 0) { // Verifica se a linha é um vértice
+    while (getline(arq, linha))
+    {
+        if (linha.rfind("v ", 0) == 0)
+        { // Verifica se a linha é um vértice
             float x, y, z;
             sscanf(linha.c_str(), "v %f %f %f", &x, &y, &z);
             vertices.emplace_back(Ponto(x, y, z)); // Adiciona o vértice ao vetor
-        } else if (linha.rfind("f ", 0) == 0) { // Verifica se a linha é uma face
+        }
+        else if (linha.rfind("f ", 0) == 0)
+        { // Verifica se a linha é uma face
             int v1, v2, v3;
             sscanf(linha.c_str(), "f %d %d %d", &v1, &v2, &v3);
 
@@ -165,15 +182,15 @@ bool Modelo3D::LeObjetoOBJ(char *Nome) {
             facesTemp.emplace_back(
                 vertices[v1 - 1], // Os índices de face começam em 1 no formato OBJ
                 vertices[v2 - 1],
-                vertices[v3 - 1]
-            );
+                vertices[v3 - 1]);
         }
     }
 
     // Armazena as faces no modelo
     nFaces = facesTemp.size();
     faces = new Face[nFaces];
-    for (int i = 0; i < nFaces; i++) {
+    for (int i = 0; i < nFaces; i++)
+    {
         faces[i] = facesTemp[i];
     }
 
@@ -181,12 +198,14 @@ bool Modelo3D::LeObjetoOBJ(char *Nome) {
     return true;
 }
 
-void Modelo3D::DesenharOBJ() const {
+void Modelo3D::DesenharOBJ() const
+{
     glBegin(GL_TRIANGLES);
-    for (unsigned int i = 0; i < nFaces; i++) {
-        const Ponto& v1 = faces[i].getP1();
-        const Ponto& v2 = faces[i].getP2();
-        const Ponto& v3 = faces[i].getP3();
+    for (unsigned int i = 0; i < nFaces; i++)
+    {
+        const Ponto &v1 = faces[i].getP1();
+        const Ponto &v2 = faces[i].getP2();
+        const Ponto &v3 = faces[i].getP3();
 
         glVertex3f(v1.x, v1.y, v1.z);
         glVertex3f(v2.x, v2.y, v2.z);
@@ -195,9 +214,11 @@ void Modelo3D::DesenharOBJ() const {
     glEnd();
 }
 
-bool Modelo3D::LeObjetoOBJAvancado(const char* Nome) {
+bool Modelo3D::LeObjetoOBJAvancado(const char *Nome)
+{
     std::ifstream arq(Nome);
-    if (!arq.is_open()) {
+    if (!arq.is_open())
+    {
         std::cerr << "Erro ao abrir o arquivo: " << Nome << std::endl;
         return false;
     }
@@ -207,20 +228,26 @@ bool Modelo3D::LeObjetoOBJAvancado(const char* Nome) {
     std::vector<Face> facesTemp; // Armazena as faces antes de transferir
 
     std::string linha;
-    while (std::getline(arq, linha)) {
+    while (std::getline(arq, linha))
+    {
         std::istringstream iss(linha);
 
-        if (linha.rfind("v ", 0) == 0) { // Detecta vértices
+        if (linha.rfind("v ", 0) == 0)
+        { // Detecta vértices
             float x, y, z;
             iss.ignore(2); // Ignora "v "
             iss >> x >> y >> z;
             vertices.emplace_back(Ponto(x, y, z));
-        } else if (linha.rfind("vn ", 0) == 0) { // Detecta normais
+        }
+        else if (linha.rfind("vn ", 0) == 0)
+        { // Detecta normais
             float nx, ny, nz;
             iss.ignore(3); // Ignora "vn "
             iss >> nx >> ny >> nz;
             normais.emplace_back(Ponto(nx, ny, nz));
-        } else if (linha.rfind("f ", 0) == 0) { // Detecta faces
+        }
+        else if (linha.rfind("f ", 0) == 0)
+        { // Detecta faces
             int v1, v2, v3;
             int n1 = -1, n2 = -1, n3 = -1;
 
@@ -235,13 +262,20 @@ bool Modelo3D::LeObjetoOBJAvancado(const char* Nome) {
             sscanf(v3n3.c_str(), "%d//%d", &v3, &n3);
 
             // Ajusta índices para começar em 0
-            v1--; v2--; v3--;
-            n1--; n2--; n3--;
+            v1--;
+            v2--;
+            v3--;
+            n1--;
+            n2--;
+            n3--;
 
             // Cria a face com vértices e normais (se disponíveis)
-            if (n1 >= 0 && n2 >= 0 && n3 >= 0) {
+            if (n1 >= 0 && n2 >= 0 && n3 >= 0)
+            {
                 facesTemp.emplace_back(vertices[v1], vertices[v2], vertices[v3], normais[n1]);
-            } else {
+            }
+            else
+            {
                 facesTemp.emplace_back(vertices[v1], vertices[v2], vertices[v3]);
             }
         }
@@ -250,11 +284,53 @@ bool Modelo3D::LeObjetoOBJAvancado(const char* Nome) {
     // Transfere os dados para o modelo 3D
     nFaces = facesTemp.size();
     faces = new Face[nFaces];
-    for (unsigned int i = 0; i < nFaces; i++) {
+    for (unsigned int i = 0; i < nFaces; i++)
+    {
         faces[i] = facesTemp[i];
     }
 
     std::cout << "Modelo carregado com sucesso: " << nFaces << " faces." << std::endl;
     arq.close();
     return true;
+}
+
+Poliedro Modelo3D::CalcularBoundingBoxModelo()
+{
+    float MinX = std::numeric_limits<float>::max();
+    float MinY = std::numeric_limits<float>::max();
+    float MinZ = std::numeric_limits<float>::max();
+
+    float MaxX = std::numeric_limits<float>::lowest();
+    float MaxY = std::numeric_limits<float>::lowest();
+    float MaxZ = std::numeric_limits<float>::lowest();
+
+    boundingBox.setMin(Ponto(MinX, MinY, MinZ));
+    boundingBox.setMax(Ponto(MaxX, MaxY, MaxZ));
+
+    for (unsigned int i = 0; i < nFaces; i++)
+    {
+        Face &face = faces[i];
+
+        Ponto p1 = face.getP1();
+        Ponto p2 = face.getP2();
+        Ponto p3 = face.getP3();
+
+        // Poliedro boundingBoxFace = face.CalcularBoundingBox();
+
+        Ponto minBBox = boundingBox.getMin();
+        Ponto maxBBox = boundingBox.getMax();
+
+        // Ponto minFace = boundingBoxFace.getMin();
+        // Ponto maxFace = boundingBoxFace.getMax();
+
+        boundingBox.setMin(Ponto(std::min(minBBox.x, std::min(p1.x, std::min(p2.x, p3.x))),
+                                 std::min(minBBox.y, std::min(p1.y, std::min(p2.y, p3.y))),
+                                 std::min(minBBox.z, std::min(p1.z, std::min(p2.z, p3.z)))));
+
+        boundingBox.setMax(Ponto(std::max(maxBBox.x, std::max(p1.x, std::max(p2.x, p3.x))),
+                                 std::max(maxBBox.y, std::max(p1.y, std::max(p2.y, p3.y))),
+                                 std::max(maxBBox.z, std::max(p1.z, std::max(p2.z, p3.z)))));
+    }
+
+    return boundingBox;
 }
