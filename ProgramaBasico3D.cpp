@@ -573,11 +573,11 @@ void display( void )
     // dog.DesenharCompleto();
     // glPopMatrix();
 
-    // glPushMatrix();
-    // glTranslatef(-3.0f, 2.5f, 0.0f);
-    // glScalef(1.0f, 1.0f, 1.0f);
-    // leo.DesenharOBJ();
-    // glPopMatrix();
+    glPushMatrix();
+    glTranslatef(-3.0f, 2.5f, 0.0f);
+    glScalef(1.0f, 1.0f, 1.0f);
+    leo.DesenharSimples();
+    glPopMatrix();
 
     DesenhaJogador();
     

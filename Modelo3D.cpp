@@ -59,7 +59,6 @@ bool Modelo3D::LeObjetoSimples(char *Nome) {
     return true;
 }
 
-
 bool Modelo3D::LeObjetoCompleto(const char *Nome) {
     ifstream arq;
     arq.open(Nome, ios::in);
@@ -140,7 +139,6 @@ void Modelo3D::DesenharCompleto() const {
     glEnd();
 }
 
-
 bool Modelo3D::LeObjetoOBJ(char *Nome) {
     ifstream arq;
     arq.open(Nome, ios::in);
@@ -196,7 +194,6 @@ void Modelo3D::DesenharOBJ() const {
     }
     glEnd();
 }
-
 
 bool Modelo3D::LeObjetoOBJAvancado(const char* Nome) {
     std::ifstream arq(Nome);
