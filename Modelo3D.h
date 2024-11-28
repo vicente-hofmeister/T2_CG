@@ -13,9 +13,19 @@ private:
 public:
     Modelo3D() = default;
 
-    bool LeObjeto(char *Nome);
+    bool LeObjetoSimples(char *Nome);
 
-    void desenhar() const;
+    bool LeObjetoCompleto(const char *Nome);
+
+    void DesenharSimples() const;
+
+    void DesenharCompleto() const;
+
+    bool LeObjetoOBJ(char* Nome);
+    
+    void DesenharOBJ() const;
+
+    bool LeObjetoOBJAvancado(const char* Nome);
 };
 
 #endif 

@@ -4,7 +4,7 @@ PROG = BasicoOpenGL.exe
 #FONTES = Linha.cpp Ponto.cpp Temporizador.cpp InterseccaoEntreTodasAsLinhas.cpp 
 #FONTES = Ponto.cpp Poligono.cpp Temporizador.cpp ListaDeCoresRGB.cpp ProgramaBasicoOpenGL.cpp
 #FONTES = ExemploDeManipulacaoDeImagens.cpp ImageClass.cpp Temporizador.cpp SOIL/SOIL.cpp SOIL/image_DXT.cpp SOIL/image_helper.cpp SOIL/stb_image_aug.cpp
-FONTES = Ponto.cpp Poligono.cpp Poliedro.cpp Face.cpp Modelo3D.cpp Temporizador.cpp ListaDeCoresRGB.cpp Instancia.cpp Tools.cpp ProgramaBasico3D.cpp
+FONTES = Ponto.cpp Poligono.cpp Poliedro.cpp Modelo3D.cpp Temporizador.cpp ListaDeCoresRGB.cpp Instancia.cpp Tools.cpp ProgramaBasico3D.cpp
 
 OBJETOS = $(FONTES:.cpp=.cpp)
 
