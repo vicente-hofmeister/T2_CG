@@ -6,8 +6,8 @@ PROG = BasicoOpenGL
 #FONTES = ExemploDeManipulacaoDeImagens.cpp ImageClass.cpp Temporizador.cpp SOIL/SOIL.cpp SOIL/image_DXT.cpp SOIL/image_helper.cpp SOIL/stb_image_aug.cpp
 
 # FONTES = Ponto.cpp Poligono.cpp Temporizador.cpp ListaDeCoresRGB.cpp Instancia.cpp ModeloMatricial.cpp TransformacoesGeometricas.cpp
-FONTES = Ponto.cpp Poligono.cpp Modelo3D.cpp Face.cpp Temporizador.cpp ListaDeCoresRGB.cpp Instancia.cpp Tools.cpp ProgramaBasico3D.cpp
 
+FONTES = Ponto.cpp Poligono.cpp Modelo3D.cpp Face.cpp Temporizador.cpp ListaDeCoresRGB.cpp Instancia.cpp Tools.cpp ProgramaBasico3D.cpp
 
 OBJETOS = $(FONTES:.cpp=.o)
 CPPFLAGS = -g -O3 -DGL_SILENCE_DEPRECATION -Wno-write-strings -Wno-narrowing -Wno-stringop-overflow # -Wall -g  # Todas as warnings, infos de debug
