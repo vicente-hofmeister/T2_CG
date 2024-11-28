@@ -11,31 +11,37 @@ Ponto::Ponto ()
 {
     x=y=z=0;
 }
+
 Ponto::Ponto(float x, float y, float z)
 {
     this->x = x;
     this->y = y;
     this->z = z;
 }
+
 void Ponto::set(float x, float y, float z)
 {
     this->x = x;
     this->y = y;
     this->z = z;
 }
+
 void Ponto::imprime() {
     cout << "(" << x << ", " << y << ", " << z <<")" << flush;
 }
+
 void Ponto::imprime(char const *msg)
 {
     cout << msg;
     imprime();
 }
+
 void Ponto::imprime(char const *msgAntes, char const *msgDepois)
 {
     imprime(msgAntes);
     cout << msgDepois;
 }
+
 void Ponto::multiplica(double x, double y, double z)
 {
     this->x *= x;
@@ -62,7 +68,6 @@ void Ponto::rotacionaZ(float angulo)
     //imprime();
 }
 
-
 void Ponto::rotacionaY(float angulo)
 {
     float xr, zr;
@@ -82,6 +87,7 @@ void Ponto::rotacionaX(float angulo)
     y = yr;
     z = zr;
 }
+
 double Ponto::modulo()
 {
     return sqrt(x*x+y*y+z*z);
@@ -95,7 +101,6 @@ void Ponto::versor()
     z /= m;
 }
 
-
 Ponto ObtemMaximo (Ponto P1, Ponto P2)
 {
     Ponto Max;
@@ -105,6 +110,7 @@ Ponto ObtemMaximo (Ponto P1, Ponto P2)
     Max.z = (P2.z > P1.x) ? P2.z : P1.z;
     return Max;
 }
+
 Ponto ObtemMinimo (Ponto P1, Ponto P2)
 {
     Ponto Min;
@@ -114,6 +120,7 @@ Ponto ObtemMinimo (Ponto P1, Ponto P2)
     Min.z = (P2.z < P1.x) ? P2.z : P1.z;
     return Min;
 }
+
 bool operator==(Ponto P1, Ponto P2)
 {
     if (P1.x != P2.x) return false;
@@ -122,6 +129,7 @@ bool operator==(Ponto P1, Ponto P2)
     return true;
 
 }
+
 Ponto operator+(Ponto P1, Ponto P2)
 {
     Ponto temp;
@@ -141,6 +149,7 @@ Ponto operator- (Ponto P1, Ponto P2)
     temp.z -= P2.z;
     return temp;
 }
+
 Ponto operator* (Ponto P1, float k)
 {
     Ponto temp;
