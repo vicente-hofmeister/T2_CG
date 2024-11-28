@@ -455,6 +455,18 @@ void DefineLuz(void)
 
 }
 // **********************************************************************
+//  void DefineLuz(void)
+// **********************************************************************
+void CalculaPoliedroParaEsfera(const Ponto& centro, float raio, Poliedro& poliedro) {
+    // Calcula os pontos min e max
+    Ponto pontoMin(centro.x - raio, centro.y - raio, centro.z - raio);
+    Ponto pontoMax(centro.x + raio, centro.y + raio, centro.z + raio);
+
+    // Define o poliedro com os pontos calculados
+    poliedro.setMin(pontoMin);
+    poliedro.setMax(pontoMax);
+}
+// **********************************************************************
 // 
 // **********************************************************************
 bool ChecaColisao(const Poliedro& poliedro1, const Poliedro& poliedro2) {
@@ -479,6 +491,53 @@ bool ChecaColisao(const Poliedro& poliedro1, const Poliedro& poliedro2) {
     // Os cubos colidem se houver sobreposição em todos os eixos
     return colisaoX && colisaoY && colisaoZ;
 }
+// **********************************************************************
+//
+// **********************************************************************
+bool ChecaColisaoPewPew() {
+    if (PosicaoPewPew.y <= 0.0f) { // Verifica colisão com o chão
+        PewPewNoAr = false;
+        return true;
+    }
+
+    Poliedro PPewPew = Poliedro(PosicaoPewPew, PosicaoPewPew);
+
+    for (int i = 0; i < 25; i++) {
+        for (int j = 0; j < 15; j++) {
+            if (paredao[i][j]) {
+                // Calcula posição do bloco com base nos índices
+                float x = i - 12.5f;
+                float y = j;
+                float z = 0.0f;
+
+                Ponto pontoMin(x - 0.5f, y - 0.5f, z - 0.5f);
+                Ponto pontoMax(x + 0.5f, y + 0.5f, z + 0.5f);
+                Poliedro PParede = Poliedro(pontoMin, pontoMax);
+
+                // Verifica colisão com o bloco
+                if (ChecaColisao(PPewPew, PParede)) {
+                    PewPewNoAr = false;
+
+                    // Remove o bloco atingido e os 8 ao redor
+                    for (int k = -1; k <= 1; k++) {
+                        for (int l = -1; l <= 1; l++) {
+                            int ni = i + k;
+                            int nj = j + l;
+
+                            // Certifica-se de que está dentro dos limites
+                            if (ni >= 0 && ni < 25 && nj >= 0 && nj < 15) {
+                                paredao[ni][nj] = false;
+                            }
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 // **********************************************************************
 //
 // **********************************************************************
@@ -600,6 +659,10 @@ void MovePewPew() {
     if (PewPewNoAr) {
         DirecaoPewPew.y -= Gravidade;
         PosicaoPewPew = PosicaoPewPew + DirecaoPewPew;
+
+        if (ChecaColisaoPewPew()) {
+            PewPewNoAr = false;
+        }
     }
 }
 // **********************************************************************
@@ -647,6 +710,7 @@ void display( void )
     // dog.DesenharSimples();
     // glPopMatrix();
     DesenhaJogador();
+    ChecaColisaoPewPew();
     DesenhaPewPew();
 
 	glPushMatrix(); 
