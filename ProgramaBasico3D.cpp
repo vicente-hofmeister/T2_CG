@@ -95,8 +95,10 @@ std::vector<Modelo3D> ListaCachorro;
 Modelo3D vaquinha = Modelo3D();
 Modelo3D dog = Modelo3D();
 Modelo3D leo = Modelo3D();
+GLuint texture_id[2];
 GLuint TEX1;
 GLuint TEX2;
+
 bool paredao[25][15];
 // **********************************************************************
 //  void init(void)
@@ -118,7 +120,13 @@ void init(void)
     glEnable(GL_CULL_FACE);
     glEnable(GL_NORMALIZE);
     glShadeModel(GL_SMOOTH);
+    glEnable (GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
     // glShadeModel(GL_FLAT);
+
+    glPixelStorei ( GL_UNPACK_ALIGNMENT, 1 );
 
     for (int i = 0; i < 25; i++) {
         for (int j = 0; j < 15; j++) {
@@ -436,11 +444,10 @@ void DefineLuz(void)
 {
     // Define cores para um objeto dourado
     // GLfloat LuzAmbiente[]   = {0.0, 0.0, 0.0 } ;
-    GLfloat LuzAmbiente[] = {0.4, 0.4, 0.4};
-    GLfloat LuzDifusa[] = {0.7, 0.7, 0.7};
-    // GLfloat LuzDifusa[]   = {0, 0, 0};
-    GLfloat PosicaoLuz0[] = {0.0f, 3.0f, 5.0f}; // Posi��o da Luz
-    GLfloat LuzEspecular[] = {0.9f, 0.9f, 0.9};
+    GLfloat LuzAmbiente[] = {0.2f, 0.2f, 0.2f, 1.0f};
+    GLfloat LuzDifusa[] = {0.8f, 0.8f, 0.8f, 1.0f};
+    GLfloat LuzEspecular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat PosicaoLuz0[] = {0.0f, 5.0f, 5.0f, 1.0f};
     // GLfloat LuzEspecular[] = {0.0f, 0.0f, 0.0 };
 
     GLfloat Especularidade[] = {1.0f, 1.0f, 1.0f};
@@ -486,7 +493,6 @@ void CalculaPoliedroParaEsfera(const Ponto& centro, float raio, Poliedro& polied
 }
 // **********************************************************************
 // 
-
 // **********************************************************************
 bool ChecaColisao(const Poliedro &poliedro1, const Poliedro &poliedro2)
 {
@@ -557,7 +563,6 @@ bool ChecaColisaoPewPew() {
     }
     return false;
 }
-
 // **********************************************************************
 //
 // **********************************************************************
@@ -760,10 +765,10 @@ void display(void)
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(0.0f, 2.5f, 0.0f);
+    glTranslatef(-5.0f, 2.5f, -5.0f);
     glScalef(0.1f, 0.10f, 0.10f);
     glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-    glColor3f(1.0, 0.0, 0.0);
+    glColor3f(0.0, 1.0, 0.5);
     vaquinha.DesenharSimples();
     glPopMatrix();
 
@@ -775,23 +780,19 @@ void display(void)
     // vaquinha.DesenharSimples();
     // glPopMatrix();
 
-    // glPushMatrix();
-    // glTranslatef(3.0f, 0.5f, 0.0f);
-    // glScalef(0.2f, 0.2f, 0.2f);
-    // dog.DesenharSimples();
-    // glPopMatrix();
+    glPushMatrix();
+    glColor3f(1.0, 0.0, 0.0);
+    glTranslatef(5.0f, 0.0f, -5.0f);
+    glScalef(0.2f, 0.2f, 0.2f);
+    dog.DesenharSimples();
+    glPopMatrix();
+
     DesenhaJogador();
     ChecaColisaoPewPew();
     DesenhaPewPew();
 
 
-    glPushMatrix();
-    glTranslatef(-4.0f, 0.0f, 2.0f);
-    glRotatef(angulo, 0, 1, 0);
-    glColor3f(0.6156862745, 0.8980392157, 0.9803921569); // Azul claro
-    glutSolidCube(2);
-    glPopMatrix();
-
+  
     // glColor3f(0.8,0.8,0);
     // glutSolidTeapot(2);
     // DesenhaParedao();
