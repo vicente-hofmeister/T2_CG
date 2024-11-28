@@ -16,6 +16,7 @@ public:
     bool LeObjetoSimples(char *Nome);
 
     void DesenharSimples() const;
+
 };
 
 #endif 

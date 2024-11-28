@@ -24,17 +24,21 @@
 
 Face *faces;
 unsigned int nFaces;
+Poliedro boundingBox;
 
-bool Modelo3D::LeObjetoSimples(char *Nome) {
+bool Modelo3D::LeObjetoSimples(char *Nome)
+{
     ifstream arq;
     arq.open(Nome, ios::in);
-    if (!arq) {
+    if (!arq)
+    {
         cout << "Erro na abertura do arquivo " << Nome << "." << endl;
         return false;
     }
 
     arq >> nFaces;
-    if (nFaces <= 0) {
+    if (nFaces <= 0)
+    {
         cout << "Erro: Número inválido de faces no arquivo." << endl;
         return false;
     }
@@ -42,9 +46,10 @@ bool Modelo3D::LeObjetoSimples(char *Nome) {
     faces = new Face[nFaces]; // Aloca memória para as faces
 
     float x, y, z;
-    for (int i = 0; i < nFaces; i++) {
+    for (int i = 0; i < nFaces; i++)
+    {
         // Lê os três vértices
-        arq >> x >> y >> z; 
+        arq >> x >> y >> z;
         Ponto p1(x, y, z);
 
         arq >> x >> y >> z;
@@ -59,9 +64,55 @@ bool Modelo3D::LeObjetoSimples(char *Nome) {
     return true;
 }
 
-void Modelo3D::DesenharSimples() const {
+
+bool Modelo3D::LeObjetoCompleto(const char *Nome)
+{
+    ifstream arq;
+    arq.open(Nome, ios::in);
+    if (!arq)
+    {
+        cout << "Erro na abertura do arquivo " << Nome << "." << endl;
+        return false;
+    }
+    int nGrupos, nText;
+    char tipo;
+    arq >> tipo;
+    arq >> nFaces;
+    arq >> nGrupos >> nText;
+
+    faces = new Face[nFaces];
+
+    for (int i = 0; i < nFaces; i++)
+    {
+        float x, y, z;
+        unsigned int cor;
+        int grupo = -1;
+
+        // Le os tres vertices
+        arq >> x >> y >> z; // Vertice 1
+        faces[i].setP1(Ponto(x, y, z));
+        arq >> x >> y >> z; // Vertice 2
+        faces[i].setP2(Ponto(x, y, z));
+        arq >> x >> y >> z; // Vertice 3
+        faces[i].setP3(Ponto(x, y, z));
+
+        arq >> std::hex >> cor;
+        faces[i].setCor(cor);
+
+        if (!(arq >> grupo))
+        {                // Tenta ler o grupo, se não existir mantém o padrão
+            arq.clear(); // Limpa o estado de erro
+        }
+        faces[i].setGrupo(grupo);
+    }
+    return true;
+}
+
+void Modelo3D::DesenharSimples() const
+{
     glBegin(GL_TRIANGLES);
-    for (unsigned int i = 0; i < nFaces; i++) {
+    for (unsigned int i = 0; i < nFaces; i++)
+    {
         // Obtenha os vértices da face atual
         Ponto p1 = faces[i].getP1();
         Ponto p2 = faces[i].getP2();
@@ -94,3 +145,4 @@ void Modelo3D::DesenharSimples() const {
     }
     glEnd();
 }
+
