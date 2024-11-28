@@ -39,6 +39,7 @@ using namespace std;
 #include "Tools.h"
 #include "Poliedro.h"
 #include "Modelo3D.h"
+#include "TextureClass.h"
 
 Temporizador T;
 double AccumDeltaT = 0;
@@ -65,7 +66,7 @@ Ponto VetorAlvo;
 GLfloat CameraMatrix[4][4];
 GLfloat InvCameraMatrix[4][4];
 Ponto PosicaoJogador(0, -0.5, 4);
-Ponto ultimoSemColisao(0, -0.5, 4);
+Ponto ultimoSemColisao;
 float RotacaoJogador = 0.0f;
 float movimento = 0.1f;
 float rotacao = 1.75f;
@@ -84,10 +85,18 @@ std::vector<Modelo3D> ListaCachorro;
 Modelo3D vaquinha = Modelo3D();
 Modelo3D dog = Modelo3D();
 Modelo3D leo = Modelo3D();
+GLuint TEX1;
+GLuint TEX2;
 // **********************************************************************
 //  void init(void)
 //        Inicializa os parametros globais de OpenGL
 // **********************************************************************
+void initTexture (void)
+{
+    TEX1 = LoadTexture("tijovoVermelho.jpeg");
+    TEX2 = LoadTexture("grama.jpeg");
+}
+
 void init(void)
 {
     glClearColor(0.4f, 1.0f, 0.0f, 1.0f); // Fundo de tela preto
@@ -363,6 +372,7 @@ void DesenhaPoliedro(Ponto p1, Ponto p2)
     glTranslatef(centralX, centralY, centralZ);
     glScalef(lengthX, lengthY, lengthZ);
     glutSolidCube(1);
+    glBindTexture (GL_TEXTURE_2D, TEX1);
     glEnd();
     glPopMatrix();
 }
@@ -472,8 +482,8 @@ void VerificaColisoesComBlocos()
             CorJogador[2] = 0.0f;
             cout << "COLISAO" << endl;
 
-            movimento = 0.0f;
             PosicaoJogador = ultimoSemColisao;
+            movimento = 0.0f;
         }
 
         else
@@ -760,6 +770,7 @@ void keyboardUp(unsigned char key, int x, int y)
 // **********************************************************************
 void atualizaMovimento()
 {
+
     if (teclaW)
     {
         PosicaoJogador.x -= movimento * sin(RotacaoJogador * M_PI / 180.0f);
@@ -782,6 +793,7 @@ void atualizaMovimento()
     VerificaColisoesComBlocos();
     VerificaColisoesComNPCs();
 
+    // movimento = 0.1f;
     glutPostRedisplay();
 }
 // **********************************************************************
