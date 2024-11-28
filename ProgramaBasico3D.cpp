@@ -107,8 +107,7 @@ void init(void)
     Poliedro poli2 = Poliedro(Ponto(-13.5f,-1.0f,-8.0f),Ponto(-12.5f,5.0f,-4.0f));
 
     vaquinha.LeObjetoSimples("Vaca.tri");
-    // dog.LeObjetoCompleto("dog.tri");
-    leo.LeObjetoOBJAvancado("leo.obj");
+    dog.LeObjetoSimples("dog.tri");
 
 
     ListaBlocos.push_back(ParedeInicial);
@@ -447,7 +446,6 @@ bool ChecaColisao(const Poliedro& poliedro1, const Poliedro& poliedro2) {
     // Os cubos colidem se houver sobreposição em todos os eixos
     return colisaoX && colisaoY && colisaoZ;
 }
-
 // **********************************************************************
 //
 // **********************************************************************
@@ -580,16 +578,10 @@ void display( void )
     vaquinha.DesenharSimples();
     glPopMatrix();
 
-    // glPushMatrix();
-    // glTranslatef(3.0f, 2.5f, 0.0f);
-    // glScalef(1.0f, 1.0f, 1.0f);
-    // dog.DesenharCompleto();
-    // glPopMatrix();
-
     glPushMatrix();
-    glTranslatef(-3.0f, 2.5f, 0.0f);
-    glScalef(1.0f, 1.0f, 1.0f);
-    leo.DesenharSimples();
+    glTranslatef(3.0f, 0.5f, 0.0f);
+    glScalef(0.2f, 0.2f, 0.2f);
+    dog.DesenharSimples();
     glPopMatrix();
 
     DesenhaJogador();
