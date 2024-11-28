@@ -69,16 +69,15 @@ float movimento = 0.1f;
 float rotacao = 1.75f;
 float anguloCanhao = 0.0f;
 Ponto CentroCanhao = Ponto();
-Ponto NormalCanhao = Ponto();
+Ponto PontaCanhao = Ponto();
 Ponto DirecaoCanhao = Ponto();
-bool desenhaLinha = false;
 bool PewPewNoAr = false;
 Ponto PosicaoPewPew = Ponto();
 Ponto DirecaoPewPew = Ponto();
-float ForcaPewPew = 1.0f;
+float ForcaPewPew = 0.75f;
 float Gravidade = 0.05f;
-float DistanciaCamera = 3.0f;
-float AlturaCamera = 1.5f;
+float DistanciaCamera = 4.0f;
+float AlturaCamera = 2.5f;
 float CorJogador[3] = {0.75f, 0.75f, 0.0f};
 float BlocoTamMin = 0.1f;
 Poliedro BoundingBoxJogador;
@@ -295,7 +294,7 @@ void CalculaNormalECentroCanhao() {
     DirecaoCanhao.rotacionaX(anguloCanhao);
     DirecaoCanhao.rotacionaY(RotacaoJogador);
 
-    NormalCanhao = CentroCanhao + DirecaoCanhao * ForcaPewPew;
+    PontaCanhao = CentroCanhao + DirecaoCanhao * 1.5;
 
 }
 // **********************************************************************
@@ -580,22 +579,10 @@ void reshape( int w, int h )
 // **********************************************************************
 //
 // **********************************************************************
-void DesenhaNormalCanhao() {
-    if (desenhaLinha) {
-        glColor3f(1.0f, 0.0f, 0.0f); // Vermelho para destacar a normal
-        glBegin(GL_LINES);
-        glVertex3f(CentroCanhao.x, CentroCanhao.y, CentroCanhao.z); // Origem
-        glVertex3f(NormalCanhao.x, NormalCanhao.y, NormalCanhao.z);             // Destino
-        glEnd();
-    }
-}
-// **********************************************************************
-//
-// **********************************************************************
 void PewPew() {
     PewPewNoAr = true;
     CalculaNormalECentroCanhao();
-    PosicaoPewPew = CentroCanhao;
+    PosicaoPewPew = PontaCanhao;
     DirecaoPewPew = DirecaoCanhao * ForcaPewPew;
 }
 // **********************************************************************
@@ -607,6 +594,9 @@ void MovePewPew() {
         PosicaoPewPew = PosicaoPewPew + DirecaoPewPew;
     }
 }
+// **********************************************************************
+//
+// **********************************************************************
 void DesenhaPewPew() {
     MovePewPew();
     glPushMatrix();
@@ -649,7 +639,6 @@ void display( void )
     // glPopMatrix();
     DesenhaJogador();
     DesenhaPewPew();
-    DesenhaNormalCanhao();
     DesenhaParede();
 
 	glPushMatrix(); 
@@ -722,8 +711,19 @@ void keyboard ( unsigned char key, int x, int y )
             if (anguloCanhao > -10.0f)
                 anguloCanhao -= 2.5f;
             break;
+        case 'e':
+            if (ForcaPewPew == 0.75f)
+                ForcaPewPew = 1.0f;
+            else if (ForcaPewPew == 1.0f)
+                ForcaPewPew = 1.25f;
+            else if (ForcaPewPew == 1.25f)
+                ForcaPewPew = 1.5f;
+            else if (ForcaPewPew == 1.5f)
+                ForcaPewPew = 0.5f;
+            else 
+                ForcaPewPew = 0.75f;
+            break;
         case ' ':
-            desenhaLinha = !desenhaLinha;
             PewPew();
             break;
         case 'p':
